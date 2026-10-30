@@ -140,8 +140,21 @@
         <ElTableColumn label="操作" width="120">
           <template #default="{ row }">
             <ElSpace>
-              <ElButton v-role="'btn0007'" text type="info" size="small" @click="handleButtonEdit(row)">编辑</ElButton>
-              <ElButton v-role="'btn0008'" text type="danger" size="small" @click="handleButtonDelete(row)">
+              <ElButton
+                v-role="'btn0007'"
+                text
+                type="info"
+                size="small"
+                @click="handleButtonEdit(row as Api.Setting.Menu)"
+                >编辑</ElButton
+              >
+              <ElButton
+                v-role="'btn0008'"
+                text
+                type="danger"
+                size="small"
+                @click="handleButtonDelete(row as Api.Setting.Menu)"
+              >
                 删除
               </ElButton>
             </ElSpace>

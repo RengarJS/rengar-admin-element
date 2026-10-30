@@ -192,7 +192,8 @@ const transitionOptions = [
   { label: '无动画', value: 'none' },
 ] as const
 
-function handleChangePrimaryColor(color: string) {
+function handleChangePrimaryColor(color: string | null) {
+  if (!color) return
   injectTailwindCssVarToGlobal(color, 'primary')
 }
 

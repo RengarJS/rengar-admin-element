@@ -100,8 +100,8 @@ const searchContent = ref('')
 const activeIndex = ref(-1) // 修改默认值为-1，表示无选中项
 
 let isComposing = false
-function handleKeyDown(e: KeyboardEvent) {
-  isComposing = e.isComposing
+function handleKeyDown(e: Event | KeyboardEvent) {
+  isComposing = e instanceof KeyboardEvent && e.isComposing
 }
 
 const {

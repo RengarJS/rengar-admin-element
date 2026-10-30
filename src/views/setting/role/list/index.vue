@@ -14,9 +14,11 @@
       <ElTableColumn label="操作" width="260" fixed="right">
         <template #default="{ row }">
           <ElSpace>
-            <ElButton v-role="'btn0012'" type="primary" @click="handleEdit(row)">编辑</ElButton>
-            <ElButton v-role="'btn0014'" type="primary" @click="handleConfigPermmsion(row)">权限配置</ElButton>
-            <ElButton v-role="'btn0013'" type="danger" @click="handleDelete(row)">删除</ElButton>
+            <ElButton v-role="'btn0012'" type="primary" @click="handleEdit(row as Api.Setting.Role)">编辑</ElButton>
+            <ElButton v-role="'btn0014'" type="primary" @click="handleConfigPermmsion(row as Api.Setting.Role)"
+              >权限配置</ElButton
+            >
+            <ElButton v-role="'btn0013'" type="danger" @click="handleDelete(row as Api.Setting.Role)">删除</ElButton>
           </ElSpace>
         </template>
       </ElTableColumn>

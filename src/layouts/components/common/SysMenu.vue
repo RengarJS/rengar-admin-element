@@ -40,9 +40,10 @@ const value = defineModel<RouteRecordName>('active')
 const menuRef = ref<{ updateActiveIndex: (index: string) => void }>()
 const activeIndex = computed(() => String(value.value ?? ''))
 
-function handleValueChange(val: RouteRecordName) {
-  value.value = val
-  emit('change', val)
+function handleValueChange(val: string) {
+  const routeName = val as RouteRecordName
+  value.value = routeName
+  emit('change', routeName)
 }
 
 watch(activeIndex, (index) => menuRef.value?.updateActiveIndex(index), { flush: 'post' })

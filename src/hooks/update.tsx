@@ -32,7 +32,7 @@ export function useUpdateChecker(time = 1000 * 60 * 5) {
       message: (
         <div>
           <div>检测到新版本，是否刷新页面？</div>
-          <ElButton block type="info" class="mt-2" onClick={refreshPage}>
+          <ElButton type="info" class="mt-2 w-full" onClick={refreshPage}>
             刷新
           </ElButton>
         </div>
