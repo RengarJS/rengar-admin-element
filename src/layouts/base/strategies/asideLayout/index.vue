@@ -100,7 +100,7 @@ const showAsideControl = computed(() => {
   flex-shrink: 0;
   overflow: hidden;
   border-right: 1px solid var(--el-border-color-lighter);
-  transition: width 0.2s ease;
+  transition: width 0.28s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .layout-aside.is-inverted {

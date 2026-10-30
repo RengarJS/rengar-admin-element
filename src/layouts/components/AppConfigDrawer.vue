@@ -74,7 +74,7 @@
     <div>
       <ElDivider>路由动画</ElDivider>
       <ElRadioGroup v-model="userConfig.transitionName">
-        <ElRow :gutter="16">
+        <ElRow :gutter="16" class="settings-transition-grid">
           <ElCol v-for="item in transitionOptions" :key="item.value" :span="6">
             <ElRadioButton :value="item.value">{{ item.label }}</ElRadioButton>
           </ElCol>
@@ -84,76 +84,111 @@
 
     <div>
       <ElDivider>主题色</ElDivider>
-      <ElColorPicker
-        v-model="appStore.themeOverrides.common.primaryColor"
-        :show-alpha="false"
-        @change="handleChangePrimaryColor"
-      />
+      <div class="settings-theme-color">
+        <ElColorPicker
+          v-model="appStore.themeOverrides.common.primaryColor"
+          class="settings-theme-color__picker"
+          :show-alpha="false"
+          aria-label="主题色"
+          @change="handleChangePrimaryColor"
+        />
+        <div
+          class="settings-theme-color__preview"
+          :style="{ backgroundColor: appStore.themeOverrides.common.primaryColor }"
+        >
+          {{ appStore.themeOverrides.common.primaryColor.toUpperCase() }}
+        </div>
+      </div>
     </div>
 
     <div>
       <ElDivider>网站配置</ElDivider>
-      <ElSpace direction="vertical" :size="20" class="w-full">
-        <div class="flex items-center justify-between">
-          <div>头部高度</div>
-          <ElInputNumber v-model="userConfig.headerHeight" :precision="0" />
+      <div class="settings-config-list">
+        <div class="settings-config-row">
+          <div class="settings-config-label">头部高度</div>
+          <ElInputNumber
+            v-model="userConfig.headerHeight"
+            :precision="0"
+            controls-position="right"
+            class="settings-config-input"
+          />
         </div>
-        <div class="flex items-center justify-between">
-          <div>标签栏高度</div>
-          <ElInputNumber v-model="userConfig.tabHeight" :precision="0" />
+        <div class="settings-config-row">
+          <div class="settings-config-label">标签栏高度</div>
+          <ElInputNumber
+            v-model="userConfig.tabHeight"
+            :precision="0"
+            controls-position="right"
+            class="settings-config-input"
+          />
         </div>
-        <div class="flex items-center justify-between">
-          <div>侧边栏宽度</div>
-          <ElInputNumber v-model="userConfig.asideWidth" :precision="0" />
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div>底部高度</div>
-          <ElInputNumber v-model="userConfig.footerHeight" :precision="0" />
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div>间隙</div>
-          <ElInputNumber v-model="userConfig.gap" :precision="0" />
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div>显示面包屑</div>
-          <ElSwitch v-model="userConfig.showBreadcrumb" />
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div>显示标签栏</div>
-          <ElSwitch v-model="userConfig.showTabs" />
+        <div class="settings-config-row">
+          <div class="settings-config-label">侧边栏宽度</div>
+          <ElInputNumber
+            v-model="userConfig.asideWidth"
+            :precision="0"
+            controls-position="right"
+            class="settings-config-input"
+          />
         </div>
 
-        <div class="flex items-center justify-between">
-          <div>显示底部</div>
-          <ElSwitch v-model="userConfig.showFooter" />
+        <div class="settings-config-row">
+          <div class="settings-config-label">底部高度</div>
+          <ElInputNumber
+            v-model="userConfig.footerHeight"
+            :precision="0"
+            controls-position="right"
+            class="settings-config-input"
+          />
         </div>
 
-        <div class="flex items-center justify-between">
-          <div>头部颜色反转</div>
-          <ElSwitch v-model="userConfig.invertedHeader" />
-        </div>
-        <div class="flex items-center justify-between">
-          <div>侧边栏颜色反转</div>
-          <ElSwitch v-model="userConfig.invertedAside" />
+        <div class="settings-config-row">
+          <div class="settings-config-label">间隙</div>
+          <ElInputNumber
+            v-model="userConfig.gap"
+            :precision="0"
+            controls-position="right"
+            class="settings-config-input"
+          />
         </div>
 
-        <div class="flex items-center justify-between">
-          <div>全局水印</div>
-          <ElSwitch v-model="userConfig.showWaterMark" />
+        <div class="settings-config-row">
+          <div class="settings-config-label">显示面包屑</div>
+          <ElSwitch v-model="userConfig.showBreadcrumb" class="settings-config-switch" />
         </div>
-        <div class="flex items-center justify-between">
-          <div>色弱模式</div>
-          <ElSwitch v-model="userConfig.colorWeakMode" />
+
+        <div class="settings-config-row">
+          <div class="settings-config-label">显示标签栏</div>
+          <ElSwitch v-model="userConfig.showTabs" class="settings-config-switch" />
         </div>
-        <div class="flex items-center justify-between">
-          <div>灰色模式</div>
-          <ElSwitch v-model="userConfig.grayMode" />
+
+        <div class="settings-config-row">
+          <div class="settings-config-label">显示底部</div>
+          <ElSwitch v-model="userConfig.showFooter" class="settings-config-switch" />
         </div>
-      </ElSpace>
+
+        <div class="settings-config-row">
+          <div class="settings-config-label">头部颜色反转</div>
+          <ElSwitch v-model="userConfig.invertedHeader" class="settings-config-switch" />
+        </div>
+        <div class="settings-config-row">
+          <div class="settings-config-label">侧边栏颜色反转</div>
+          <ElSwitch v-model="userConfig.invertedAside" class="settings-config-switch" />
+        </div>
+
+        <div class="settings-config-row">
+          <div class="settings-config-label">全局水印</div>
+          <ElSwitch v-model="userConfig.showWaterMark" class="settings-config-switch" />
+        </div>
+        <div class="settings-config-row">
+          <div class="settings-config-label">色弱模式</div>
+          <ElSwitch v-model="userConfig.colorWeakMode" class="settings-config-switch" />
+        </div>
+        <div class="settings-config-row">
+          <div class="settings-config-label">灰色模式</div>
+          <ElSwitch v-model="userConfig.grayMode" class="settings-config-switch" />
+        </div>
+      </div>
     </div>
 
     <template #footer>
@@ -230,4 +265,63 @@ function handleReset() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.settings-theme-color {
+  position: relative;
+  width: 100%;
+  height: 36px;
+}
+
+.settings-theme-color__picker {
+  display: block;
+  width: 100%;
+  height: 36px;
+}
+
+.settings-theme-color__picker :deep(.el-color-picker__trigger) {
+  width: 100%;
+  height: 36px;
+}
+
+.settings-theme-color__preview {
+  position: absolute;
+  z-index: 1;
+  inset: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  color: var(--el-text-color-primary);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.settings-config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-config-row {
+  display: grid;
+  grid-template-columns: minmax(104px, 36%) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-config-label {
+  color: var(--el-text-color-regular);
+}
+
+.settings-config-input {
+  width: 100%;
+}
+
+.settings-config-switch {
+  justify-self: end;
+}
+
+.settings-transition-grid {
+  row-gap: 8px;
+}
+</style>

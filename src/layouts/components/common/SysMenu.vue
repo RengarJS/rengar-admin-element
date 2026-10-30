@@ -4,6 +4,7 @@
     :default-active="activeIndex"
     :mode
     :collapse="mode === 'vertical' && Boolean(collapsed)"
+    :collapse-transition="true"
     :background-color="inverted ? '#0f172a' : undefined"
     :text-color="inverted ? '#f8fafc' : undefined"
     active-text-color="var(--el-color-primary)"
