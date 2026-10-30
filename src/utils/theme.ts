@@ -22,8 +22,5 @@ export function injectTailwindCssVarToGlobal(color: string, key = 'primary') {
 
   appStore.themeOverrides.common = {
     primaryColor: colors.DEFAULT,
-    primaryColorHover: colors['400'],
-    primaryColorPressed: colors['700'],
-    primaryColorSuppl: colors['400'],
   }
 }

@@ -11,15 +11,15 @@
 
 ## 简介
 
-`rengar-admin`是一个基于`vue3.5`+`vite`+`naive-ui`+`element-plus`+`typescript`的后台管理系统模板。开箱即用，完全免费。项目正在从 Naive UI 向 Element Plus 逐步迁移，迁移期间两套组件库共存。
+`rengar-admin` 是一个基于 Vue 3.5、Vite、Element Plus 和 TypeScript 的后台管理系统模板。开箱即用，完全免费。应用界面和全局反馈均使用 Element Plus；Naive UI 依赖及自动导入配置暂时保留为迁移兼容层。
 
 ## 特性
 
 - 完全免费：完全开源免费，遵循 MIT 开源协议，你可以自由使用、修改和分发
 - 维护积极：bug修复速度快，积极维护，不烂尾，有问题随时交流
 - 生产环境验证： 真实的后端部署（非mock接口），提供开源的后端，经过生产环境验证，确保稳定性和性能
-- 优雅的设计： 使用 Naive UI 与 Element Plus 构建界面，兼容暗黑模式，代码简单易懂，无过度封装
-- 先进技术栈： 采用 Vue 3.5 + Vite 7 + TypeScript + Naive UI + Element Plus + Pinia + UnoCSS 等技术
+- 优雅的设计： 使用 Element Plus 构建页面界面，兼容暗黑模式，代码简单易懂，无过度封装
+- 先进技术栈： 采用 Vue 3.5 + Vite + TypeScript + Element Plus + Pinia + UnoCSS 等技术；Naive UI 依赖暂作迁移兼容保留
 - 智能路由： 创新的文件系统路由，根据目录结构自动生成路由配置，适配vue-router类型化路由
 - 页面缓存增强： 特殊的路由缓存方案，自动注入组件名称，轻松实现多级路由的 KeepAlive 功能
 - 类型安全： TypeScript 类型覆盖率 100%，配合 VS Code 享受智能提示，让代码更加健壮可靠

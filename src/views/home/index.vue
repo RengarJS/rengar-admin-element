@@ -242,11 +242,11 @@ const techStacks = [
     color: 'text-purple-500',
   },
   {
-    name: 'Naive UI',
-    version: 'v2.42.0',
-    description: 'Vue3组件库',
-    url: 'https://www.naiveui.com/',
-    icon: 'logos:vue',
+    name: 'Element Plus',
+    version: 'v2.14.7',
+    description: '基于 Vue 3 的组件库',
+    url: 'https://element-plus.org/zh-CN/',
+    icon: 'logos:element',
     color: 'text-primary',
   },
   {

@@ -1,9 +1,14 @@
 import { useMediaQuery } from '@vueuse/core'
-import { userConfig as customConfig, bgColor } from '@/config/app'
+import { userConfig as customConfig } from '@/config/app'
 import { themeColor } from '@rengar-admin/color'
 import { injectTailwindCssVarToGlobal } from '@/utils/theme'
 import { cloneDeep } from 'es-toolkit'
-import type { GlobalThemeOverrides } from 'naive-ui'
+
+interface AppThemeOverrides {
+  common: {
+    primaryColor: string
+  }
+}
 
 export const useAppStore = defineStore(
   'app',
@@ -97,17 +102,10 @@ export const useAppStore = defineStore(
       return isSystemDark.value ? 'dark' : 'light'
     })
 
-    // naive-ui主题颜色覆盖
-    const themeOverrides = reactive<GlobalThemeOverrides>({
-      Layout: {
-        colorEmbedded: theme.value === 'light' ? bgColor : 'transparent',
-        footerColor: theme.value === 'light' ? bgColor : 'transparent',
-      },
+    // Element Plus 和全局样式使用的主题色配置
+    const themeOverrides = reactive<AppThemeOverrides>({
       common: {
         primaryColor: themeColor.primary.DEFAULT,
-        primaryColorHover: themeColor.primary['400'],
-        primaryColorPressed: themeColor.primary['700'],
-        primaryColorSuppl: themeColor.primary['400'],
       },
     })
 
@@ -125,12 +123,8 @@ export const useAppStore = defineStore(
     function setDetaultTheme() {
       if (theme.value === 'dark') {
         document.documentElement.classList.add('dark')
-        themeOverrides.Layout!.colorEmbedded = 'transparent'
-        themeOverrides.Layout!.footerColor = 'transparent'
       } else {
         document.documentElement.classList.remove('dark')
-        themeOverrides.Layout!.colorEmbedded = bgColor
-        themeOverrides.Layout!.footerColor = bgColor
       }
     }
 

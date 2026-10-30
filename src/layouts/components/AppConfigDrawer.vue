@@ -85,7 +85,7 @@
     <div>
       <ElDivider>主题色</ElDivider>
       <ElColorPicker
-        v-model="appStore.themeOverrides.common!.primaryColor"
+        v-model="appStore.themeOverrides.common.primaryColor"
         :show-alpha="false"
         @change="handleChangePrimaryColor"
       />

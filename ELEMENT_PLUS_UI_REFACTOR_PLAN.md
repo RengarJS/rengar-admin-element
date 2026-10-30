@@ -16,16 +16,16 @@
 ## 实施进度（2026-10-30）
 
 - 阶段 0：已完成 Naive UI / Element Plus 并存现状盘点；逐页交互回归清单仍待补齐。
-- 阶段 1：接入已完成，主题回归待做。已为 Element Plus 接入中文配置和主题色变量，同时保留 Naive UI Provider 和主题覆盖；系统主题读取改由 VueUse 提供；浅色/深色和动态主题尚未做浏览器验证。
+- 阶段 1：接入已完成，主题回归待做。已为 Element Plus 接入中文配置和主题色变量；系统主题读取改由 VueUse 提供。最初保留 Naive UI Provider 以支持分批迁移，全部页面迁移后按用户本次要求移除；浅色/深色和动态主题尚未做浏览器验证。
 - 阶段 2：组件迁移已完成，回归待做。已替换四种布局容器、菜单、面包屑、移动端抽屉、标签栏、配置抽屉、搜索弹窗、水印、用户菜单及头部控件；保留原布局 Store 状态和事件。
 - 阶段 3：组件迁移已完成，回归待做。404、登录和首页展示已替换为 Element Plus；登录、验证码、待办、图表和导航逻辑保持原有实现。
 - 阶段 4：组件迁移已完成，回归待做。用户、角色、权限列表，菜单管理和角色权限树，以及用户/角色/菜单/按钮/密码弹窗已替换为 Element Plus；保留现有 API、权限码、分页、确认反馈和权限 ID 提交逻辑。
-- 阶段 5：迁移实现已完成，回归待做。文档页外层卡片、KeepAlive 示例已换成 Element Plus；Naive UI 文档入口、Vue 文档内嵌页及示例外链已指向 Element Plus 文档，README 已说明双库并存迁移。`window.$message`、`$dialog`、`$notification` 改由 Element Plus 提供；确认框保留确认/取消、异步确认、loading、失败后保持打开及遮罩/Esc 关闭行为。`$loadingBar` 改由 Element Plus 进度条适配器实现，保留 start/finish/error 调用；`NLoadingBarProvider` 继续保留；应用版本更新提示也已改用 Element Plus 通知和按钮，保留版本轮询、通知触发与刷新动作。
-- Naive UI 仍保留在 Provider、主题覆盖类型及自动导入/构建配置中；`naive-ui` 依赖未删除。`NCustomEle` 的文件路径和 prop 保留，渲染改用 Vue 内置动态组件。
-- 追加边界复核：全仓代码扫描未发现页面或业务组件继续使用 Naive UI 组件；Naive 组件标签仅位于保留的 `AppProvider`。`NCustomEle` 已改用 Vue 内置动态组件并保留原主题样式与 prop，目前没有调用方。全局反馈调用点继续使用原 `window.$message` / `$dialog` 接口，由 Element Plus 适配层提供；主题 Store 保留 Naive 类型供 Provider 使用。
+- 阶段 5：迁移实现已完成，回归待做。文档页外层卡片、KeepAlive 示例已换成 Element Plus；Naive UI 文档入口、Vue 文档内嵌页及示例外链已指向 Element Plus 文档，README 已说明迁移后使用状态。`window.$message`、`$dialog`、`$notification` 改由 Element Plus 提供；确认框保留确认/取消、异步确认、loading、失败后保持打开及遮罩/Esc 关闭行为。`$loadingBar` 改由 Element Plus 进度条适配器实现，保留 start/finish/error 调用；应用版本更新提示也已改用 Element Plus 通知和按钮，保留版本轮询、通知触发与刷新动作。
+- Naive UI 依赖、自动导入解析器/类型和构建分包配置仍按仓库约定保留。`NCustomEle` 的文件路径和 prop 保留，渲染改用 Vue 内置动态组件。
+- 追加边界复核：此前全仓代码扫描未发现页面或业务组件使用 Naive UI；本次按用户要求继续清除应用根 Provider 的 Naive UI 运行时用法，并将主题色配置和 `$loadingBar` 类型改为项目自己的类型。`NCustomEle` 保留原主题样式与 prop，目前没有调用方。全局反馈调用点继续使用原 `window.$message` / `$dialog` 接口，由 Element Plus 适配层提供。
 - 追加迁移批次：`src/hooks/update.tsx` 将 `NButton` / `useNotification` 替换为 `ElButton` / `ElNotification`；`duration: 0` 保留原通知不自动消失的行为。版本检查间隔、请求地址和刷新时机未改。
 - 追加迁移批次：`src/stores/modules/app.ts` 复用 VueUse `useMediaQuery` 读取系统深色偏好，移除 `useOsTheme` 导入；auto/light/dark 模式、主题过渡及持久化行为未改。
-- 追加迁移批次：`src/components/AppProvider/index.vue` 将路由加载条从 Naive UI 服务切到 `ElProgress` 适配器；保留 `window.$loadingBar` 的 start/finish/error 接口及路由守卫调用，保留 Naive UI Provider。
+- 追加迁移批次：`src/components/AppProvider/index.vue` 将路由加载条从 Naive UI 服务切到 `ElProgress` 适配器；保留 `window.$loadingBar` 的 start/finish/error 接口及路由守卫调用。完成所有页面迁移后，应用根节点只保留 Element Plus `ElConfigProvider`。
 - 本次所有变更代码文件均已逐文件执行 Prettier，随后逐文件执行 ESLint `--fix`；未运行自动化测试、类型检查或构建。
 - `src/router/routes.ts` 仅保留文档显示标题和示例外链的有意调整；路由名称、路径、权限与菜单结构不变。
 - 阶段 6：部分完成。通过本地 Node 在 `127.0.0.1:7790` 启动 Vite 后，手工确认登录页 Element Plus 表单在 Naive UI Provider 下可正常渲染；用户名、密码、验证码空值校验均显示；验证码图片加载并可刷新（仅检查图片是否变化，未读取内容）；404 页面文本和两个导航按钮可见，从 404 返回登录页后路由正常，Naive loading bar 未卡在显示状态；本次 Element Plus 适配器尚未做浏览器验证。主题从跟随系统切换到浅色、深色后恢复跟随系统，深色样式可见（发生在系统主题读取改动前）。首次依赖预优化期间出现过一次动态模块加载错误，重新打开标签页后恢复。
@@ -47,8 +47,10 @@
 - 2026-10-30 继续迁移：用户编辑弹窗在 `userDetailApi` 请求期间显示 Element Plus 表单加载层并禁用确认；关闭时递增请求序号，忽略迟到的详情响应。API、DTO、表单规则和成功提交逻辑未改。目标 `.vue` 文件的定向 Prettier 与 ESLint 均通过；由于 pnpm shim 报“未配置活动 Node 版本”，改用本机缓存 Node 直接调用项目内工具。未运行自动化测试、类型检查或构建。
 - 2026-10-30 继续迁移菜单按钮弹窗：`menuDetailApi` 加载期间显示表单加载层并禁用确认；关闭时忽略迟到响应。新增/编辑标题与成功提示改按 `currentButton` 判断，避免父菜单 prop 让编辑操作误显示为新增；API 路径和提交载荷未改。该文件定向 Prettier 与 ESLint 均通过；未运行自动化测试、类型检查、构建或浏览器验证。
 - 2026-10-30 浏览器手工确认：菜单按钮编辑弹窗标题正确；详情请求期间加载遮罩可见、确认按钮禁用，返回后按钮名称、排序、状态和权限值正确。用户编辑弹窗详情也成功回填；本次响应较快，没有观察到加载遮罩持续显示。两处都只取消关闭，未保存；结束后恢复 `/setting/menu`，清理本轮新增的用户管理标签。
+- 2026-10-30 全仓 Naive UI 复核：业务页面无 Naive UI 组件、API 或文案残留；最后一个运行时使用是 `AppProvider` 中已不再需要的 Naive UI Provider，现已切换为 Element Plus `ElConfigProvider`。Store 主题色与全局加载条类型不再依赖 Naive UI；首页技术栈和 README 已体现 Element Plus。仍可搜到的 Naive UI 引用仅属保留的依赖/自动导入/类型/构建兼容配置，以及必须保持的文档路由名称和路径。
+- 本次变更文件已对所有修改的代码文件执行定向 Prettier 和 ESLint `--fix`；未运行自动化测试、类型检查或构建。
 
-**下次开始位置：** 从当前已登录的 `127.0.0.1:7788` 本地应用会话继续。阶段 6 的剩余环境项是加载条 `error`/`exception` 受控触发和自动主题跟随系统变化；若没有安全模拟入口，记录为环境限制。用户编辑弹窗的加载遮罩只需在详情请求较慢时再确认。页面级 Naive UI 组件迁移已完成；Naive UI Provider、主题类型与构建配置继续保留。
+**下次开始位置：** 从当前已登录的 `127.0.0.1:7788` 本地应用会话继续。阶段 6 的剩余环境项是加载条 `error`/`exception` 受控触发和自动主题跟随系统变化；若没有安全模拟入口，记录为环境限制。用户编辑弹窗的加载遮罩只需在详情请求较慢时再确认。应用运行时的 Naive UI 组件迁移与审计已完成；依赖、自动导入配置及文档路由身份仍按仓库约定保留。
 
 ## 不变边界
 
