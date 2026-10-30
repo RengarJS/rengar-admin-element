@@ -37,7 +37,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'naive-ui',
         component: () => import('@/views/docs/naive-ui/index.vue'),
         meta: {
-          title: 'naive-ui',
+          title: 'Element Plus',
           order: 2,
         },
       },
@@ -46,7 +46,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'naive-ui-components',
         component: () => import('@/views/docs/naive-ui-components/index.vue'),
         meta: {
-          title: 'naive-ui-components',
+          title: 'Element Plus 组件',
           order: 6,
         },
       },
@@ -130,7 +130,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/example/href/index.vue'),
         meta: {
           title: '外部链接',
-          href: 'https://www.naiveui.com/zh-CN/os-theme',
+          href: 'https://element-plus.org/zh-CN/',
           order: 2,
         },
       },

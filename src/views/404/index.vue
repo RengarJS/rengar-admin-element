@@ -2,10 +2,10 @@
   <div class="flex-center flex-y gap-8 h-screen">
     <img :src="Icon" alt="" class="w-[280px]" />
     <span class="text-2xl text-gray">页面找不到了</span>
-    <NSpace :size="40">
-      <NButton type="primary" ghost @click="handleBack">返回上一页</NButton>
-      <NButton type="primary" @click="handleHome">返回首页</NButton>
-    </NSpace>
+    <ElSpace :size="40">
+      <ElButton type="primary" plain @click="handleBack">返回上一页</ElButton>
+      <ElButton type="primary" @click="handleHome">返回首页</ElButton>
+    </ElSpace>
   </div>
 </template>
 

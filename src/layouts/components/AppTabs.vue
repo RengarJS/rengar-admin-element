@@ -4,7 +4,7 @@
       <div
         v-if="showBack"
         class="back-container h-full flex-center-x cursor-pointer gap-2 px-3 hover:bg-gray-100 dark:hover:bg-gray-800"
-        style="border-right: solid 1px var(--n-border-color)"
+        style="border-right: solid 1px var(--el-border-color)"
         @click="handleBack"
       >
         <IMaterialSymbolsArrowBackIosNew></IMaterialSymbolsArrowBackIosNew>
@@ -33,14 +33,11 @@
           ]"
           :ref="(el) => setItemRef(el as HTMLElement, item.fullPath)"
           @click="handleJump(item.fullPath)"
-          @contextmenu.prevent="handleRightClick(item.fullPath)"
         >
-          <NDropdown
-            trigger="manual"
-            :options="renderOptions(item, index)"
-            :show="dropdownVisible[item.fullPath]"
-            :on-clickoutside="handleCloseDropdown"
-            @select="(key) => handleSelect(key, item)"
+          <ElDropdown
+            trigger="contextmenu"
+            placement="bottom-start"
+            @command="(key: string) => handleSelect(key, item)"
           >
             <div
               class="flex items-center gap-2 rounded-lg px-3 py-1"
@@ -54,20 +51,36 @@
                 @click.stop="tabStore.removeTabsAction(item)"
               ></div>
             </div>
-          </NDropdown>
+            <template #dropdown>
+              <ElDropdownMenu>
+                <ElDropdownItem command="closeCurrent" :disabled="Boolean(item.fixedInTab)">
+                  <span class="i-ant-design:close-outlined mr-2"></span>关闭
+                </ElDropdownItem>
+                <ElDropdownItem command="closeOther">
+                  <span class="i-ant-design:column-width-outlined mr-2"></span>关闭其它
+                </ElDropdownItem>
+                <ElDropdownItem command="closeLeft" :disabled="index === 0">
+                  <span class="i-mdi:format-horizontal-align-left mr-2"></span>关闭左侧
+                </ElDropdownItem>
+                <ElDropdownItem command="closeRight" :disabled="index === tabsList.length - 1">
+                  <span class="i-mdi:format-horizontal-align-right mr-2"></span>关闭右侧
+                </ElDropdownItem>
+                <ElDropdownItem command="closeAll">
+                  <span class="i-ant-design:line-outlined mr-2"></span>关闭所有
+                </ElDropdownItem>
+              </ElDropdownMenu>
+            </template>
+          </ElDropdown>
         </div>
       </TransitionGroup>
     </VueDraggable>
 
-    <div class="h-full flex items-center gap-4 px-4 text-lg" style="border-left: solid 1px var(--n-border-color)">
-      <NTooltip v-if="isPc" placement="bottom">
-        <template #trigger>
-          <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="appStore.refreshRouterView">
-            <div class="i-ooui-reload"></div>
-          </div>
-        </template>
-        <span>刷新</span>
-      </NTooltip>
+    <div class="h-full flex items-center gap-4 px-4 text-lg" style="border-left: solid 1px var(--el-border-color)">
+      <ElTooltip v-if="isPc" placement="bottom" content="刷新">
+        <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="appStore.refreshRouterView">
+          <div class="i-ooui-reload"></div>
+        </div>
+      </ElTooltip>
       <div
         v-else
         class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary"
@@ -76,24 +89,20 @@
         <div class="i-ooui-reload"></div>
       </div>
 
-      <NTooltip v-if="isPc" placement="bottom">
-        <template #trigger>
-          <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="toggle">
-            <div v-if="isFullscreen" class="i-ooui-exit-fullscreen"></div>
-            <div v-else class="i-ooui-full-screen"></div>
-          </div>
-        </template>
-        <span>内容全屏</span>
-      </NTooltip>
+      <ElTooltip v-if="isPc" placement="bottom" content="内容全屏">
+        <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="toggle">
+          <div v-if="isFullscreen" class="i-ooui-exit-fullscreen"></div>
+          <div v-else class="i-ooui-full-screen"></div>
+        </div>
+      </ElTooltip>
     </div>
   </div>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { useTabStore, useAppStore } from '@/stores'
 import { useWindowSize, useDebounceFn, useFullscreen } from '@vueuse/core'
 import { VueDraggable } from 'vue-draggable-plus'
-import type { DropdownOption } from 'naive-ui'
 import type { Directive } from 'vue'
 
 const route = useRoute()
@@ -180,57 +189,7 @@ const vDragscroll: Directive<DragScrollHTMLElement> = {
 const tabStore = useTabStore()
 const { tabsList } = storeToRefs(tabStore)
 
-function renderOptions(tab: App.Tab, index: number): DropdownOption[] {
-  return [
-    {
-      label: '关闭',
-      key: 'closeCurrent',
-      icon: () => <div class="i-ant-design:close-outlined"> </div>,
-      disabled: Boolean(tab.fixedInTab),
-    },
-    {
-      label: '关闭其它',
-      key: 'closeOther',
-      icon: () => <div class="i-ant-design:column-width-outlined"> </div>,
-    },
-    {
-      label: '关闭左侧',
-      key: 'closeLeft',
-      icon: () => <div class="i-mdi:format-horizontal-align-left"> </div>,
-      disabled: index === 0,
-    },
-    {
-      label: '关闭右侧',
-      key: 'closeRight',
-      icon: () => <div class="i-mdi:format-horizontal-align-right"> </div>,
-      disabled: index === tabsList.value.length - 1,
-    },
-    {
-      label: '关闭所有',
-      key: 'closeAll',
-      icon: () => <div class="i-ant-design:line-outlined"> </div>,
-    },
-  ]
-}
-
-const dropdownVisible = reactive<Record<string, boolean>>({})
-
-function handleCloseDropdown() {
-  // 隐藏其他下拉菜单
-  Object.keys(dropdownVisible).forEach((key) => {
-    dropdownVisible[key] = false
-  })
-}
-
-function handleRightClick(fullPath: string) {
-  handleCloseDropdown()
-
-  // 显示当前下拉菜单
-  dropdownVisible[fullPath] = true
-}
-
 function handleSelect(key: string, tab: App.Tab) {
-  handleCloseDropdown()
   switch (key) {
     case 'closeCurrent':
       tabStore.removeTabsAction(tab)

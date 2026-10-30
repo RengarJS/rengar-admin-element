@@ -1,50 +1,49 @@
 <template>
-  <NModal
-    v-model:show="show"
-    preset="dialog"
+  <ElDialog
+    v-model="show"
     :title="record ? '编辑用户' : '新增用户'"
-    positive-text="确定"
-    negative-text="取消"
-    :loading
-    @after-enter="handleOpen"
-    @after-leave="handleClose"
-    @positive-click="handleSubmit"
+    width="500px"
+    @opened="handleOpen"
+    @closed="handleClose"
   >
-    <NForm ref="formRef" :model="formData" :rules class="my-8" size="small" label-placement="left" label-width="auto">
-      <NFormItem label="账户名" path="username">
-        <NInput v-model:value="formData.username" placeholder="账户名" />
-      </NFormItem>
-      <NFormItem v-if="!record" label="密码" path="password">
-        <NInput v-model:value="formData.password" placeholder="密码" />
-      </NFormItem>
-      <NFormItem v-if="!record" label="确认密码" path="confirmPassword">
-        <NInput v-model:value="formData.confirmPassword" placeholder="确认密码" />
-      </NFormItem>
-      <NFormItem label="角色绑定" path="roleIds">
-        <NSelect
-          v-model:value="formData.roleIds"
-          :options="roleList"
-          multiple
-          label-field="name"
-          value-field="id"
-          placeholder="请绑定角色"
+    <ElForm ref="formRef" :model="formData" :rules class="my-4" size="small" label-position="left" label-width="auto">
+      <ElFormItem label="账户名" prop="username">
+        <ElInput v-model="formData.username" placeholder="账户名" @input="validateFieldOnInput('username')" />
+      </ElFormItem>
+      <ElFormItem v-if="!record" label="密码" prop="password">
+        <ElInput v-model="formData.password" placeholder="密码" @input="validateFieldOnInput('password')" />
+      </ElFormItem>
+      <ElFormItem v-if="!record" label="确认密码" prop="confirmPassword">
+        <ElInput
+          v-model="formData.confirmPassword"
+          placeholder="确认密码"
+          @input="validateFieldOnInput('confirmPassword')"
         />
-      </NFormItem>
-      <NFormItem label="状态" path="status">
-        <NRadioGroup v-model:value="formData.status">
-          <NRadio :value="1">启用</NRadio>
-          <NRadio :value="0">禁用</NRadio>
-        </NRadioGroup>
-      </NFormItem>
-    </NForm>
-  </NModal>
+      </ElFormItem>
+      <ElFormItem label="角色绑定" prop="roleIds">
+        <ElSelect v-model="formData.roleIds" multiple placeholder="请绑定角色">
+          <ElOption v-for="role in roleList" :key="role.id" :label="role.name" :value="role.id" />
+        </ElSelect>
+      </ElFormItem>
+      <ElFormItem label="状态" prop="status">
+        <ElRadioGroup v-model="formData.status">
+          <ElRadio :value="1">启用</ElRadio>
+          <ElRadio :value="0">禁用</ElRadio>
+        </ElRadioGroup>
+      </ElFormItem>
+    </ElForm>
+    <template #footer>
+      <ElButton @click="show = false">取消</ElButton>
+      <ElButton type="primary" :loading="loading" @click="handleConfirm">确定</ElButton>
+    </template>
+  </ElDialog>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { userAddApi, userEditApi, userDetailApi } from '@/api/setting/user'
 import { roleListEnabledApi } from '@/api/setting/role'
 
-import { type FormRules, type FormInst } from 'naive-ui'
+import type { FormInstance, FormRules } from 'element-plus'
 import { to } from 'await-to-js'
 
 const show = defineModel<boolean>('show', {
@@ -65,13 +64,18 @@ const formData = ref<Recordable>({
   roleIds: [],
 })
 
-const formRef = useTemplateRef<FormInst>('formRef')
+const formRef = useTemplateRef<FormInstance>('formRef')
 const rules: FormRules = {
-  username: [{ required: true, message: '请输入账户名', trigger: ['blur', 'input'] }],
-  password: [{ required: true, message: '请输入密码', trigger: ['blur', 'input'] }],
-  confirmPassword: [{ required: true, message: '请输入确认密码', trigger: ['blur', 'input'] }],
+  username: [{ required: true, message: '请输入账户名', trigger: ['blur', 'change'] }],
+  password: [{ required: true, message: '请输入密码', trigger: ['blur', 'change'] }],
+  confirmPassword: [{ required: true, message: '请输入确认密码', trigger: ['blur', 'change'] }],
   roleIds: [{ required: true, type: 'array', message: '请绑定角色', trigger: ['blur', 'change'] }],
   status: [{ required: true, message: '请选择状态', type: 'number', trigger: ['blur', 'change'] }],
+}
+
+function validateFieldOnInput(field: string) {
+  const validation = formRef.value?.validateField(field)
+  void validation?.catch(() => {})
 }
 
 const roleList = ref<Api.Setting.Role[]>([])
@@ -118,6 +122,12 @@ async function handleSubmit() {
   window.$message?.success(`${record ? '编辑' : '新增'}成功`)
   emit('success')
   return true
+}
+
+async function handleConfirm() {
+  if (await handleSubmit()) {
+    show.value = false
+  }
 }
 </script>
 

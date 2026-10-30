@@ -1,10 +1,17 @@
 <template>
-  <NDropdown trigger="hover" :options="options" @select="handleSelect">
+  <ElDropdown trigger="hover" @command="handleSelect">
     <div class="flex cursor-pointer items-center gap-2 rounded-2xl px-2 py-1 hover:text-primary">
       <div class="i-line-md:account text-xl"></div>
       <span v-if="!appStore.isMobile" class="max-w-[120px] truncate text-base">{{ authStore.user?.username }}</span>
     </div>
-  </NDropdown>
+    <template #dropdown>
+      <ElDropdownMenu>
+        <ElDropdownItem v-for="option in options" :key="option.key" :command="option.key">
+          {{ option.label }}
+        </ElDropdownItem>
+      </ElDropdownMenu>
+    </template>
+  </ElDropdown>
 
   <PasswordModal v-model:show="showModal" />
 </template>

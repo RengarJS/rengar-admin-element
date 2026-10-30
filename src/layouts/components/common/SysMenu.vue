@@ -1,23 +1,22 @@
 <template>
-  <NMenu
-    v-model:value="value"
+  <ElMenu
+    ref="menuRef"
+    :default-active="activeIndex"
     :mode
-    :options="menus"
-    :collapsed
-    :collapsed-width="appStore.systemConfig.asideCollapseWidth"
-    :children-field="childrenField"
-    :indent="20"
-    responsive
-    @update:value="handleValueChange"
-  ></NMenu>
+    :collapse="mode === 'vertical' && Boolean(collapsed)"
+    :background-color="inverted ? '#0f172a' : undefined"
+    :text-color="inverted ? '#f8fafc' : undefined"
+    active-text-color="var(--el-color-primary)"
+    class="border-0"
+    @select="handleValueChange"
+  >
+    <SysMenuItem v-for="route in data" :key="String(route.name ?? route.path)" :route :children-field />
+  </ElMenu>
 </template>
 
-<script setup lang="tsx">
-import { type MenuOption } from 'naive-ui'
-import { RouterLink, type RouteLocationRaw, type RouteRecordRaw } from 'vue-router'
-import { useAppStore } from '@/stores'
-
-const appStore = useAppStore()
+<script setup lang="ts">
+import type { RouteRecordRaw } from 'vue-router'
+import SysMenuItem from './SysMenuItem.vue'
 
 const emit = defineEmits<{
   change: [val: RouteRecordName]
@@ -28,57 +27,25 @@ const {
   mode = 'vertical',
   data,
   collapsed,
+  inverted = false,
 } = defineProps<{
   mode?: 'horizontal' | 'vertical'
   data: RouteRecordRaw[]
   collapsed?: boolean
   childrenField?: string
+  inverted?: boolean
 }>()
 
 const value = defineModel<RouteRecordName>('active')
-
-const menus = computed(() => {
-  return generateMenus(data)
-})
-
-function renderLabel(route: RouteRecordRaw) {
-  if (route.meta?.href) {
-    return (
-      <a href={route.meta.href} target="_blank">
-        {route.meta?.title}
-      </a>
-    )
-  }
-
-  return !route.children ? (
-    <RouterLink to={{ name: route.name } as RouteLocationRaw}>{route.meta?.title}</RouterLink>
-  ) : (
-    <span>{route.meta?.title}</span>
-  )
-}
-
-function generateMenus(routes: RouteRecordRaw[]): MenuOption[] {
-  return routes.map((route) => {
-    const menuOption: MenuOption = {
-      label: () => renderLabel(route),
-      key: route.meta?.activeMenu || route.name,
-      icon: () => {
-        return <MenuIcon options={route.meta}></MenuIcon>
-      },
-      meta: route.meta,
-    }
-
-    if (route.children && route.children.length > 0) {
-      menuOption.children = generateMenus(route.children)
-    }
-
-    return menuOption
-  })
-}
+const menuRef = ref<{ updateActiveIndex: (index: string) => void }>()
+const activeIndex = computed(() => String(value.value ?? ''))
 
 function handleValueChange(val: RouteRecordName) {
+  value.value = val
   emit('change', val)
 }
+
+watch(activeIndex, (index) => menuRef.value?.updateActiveIndex(index), { flush: 'post' })
 </script>
 
 <style scoped></style>

@@ -9,9 +9,11 @@
       <NNotificationProvider>
         <NDialogProvider>
           <NLoadingBarProvider>
-            <GlobalNaiveTool> </GlobalNaiveTool>
-            <AppWaterMark />
-            <App></App>
+            <ElConfigProvider :locale="elementPlusLocale">
+              <GlobalUiServices />
+              <AppWaterMark />
+              <App />
+            </ElConfigProvider>
             <NGlobalStyle></NGlobalStyle>
           </NLoadingBarProvider>
         </NDialogProvider>
@@ -21,11 +23,14 @@
 </template>
 
 <script setup lang="ts">
+import elementPlusLocale from 'element-plus/es/locale/lang/zh-cn'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { darkTheme, lightTheme, zhCN, dateZhCN } from 'naive-ui'
 import { useAppStore } from '@/stores'
-import { createTextVNode } from 'vue'
+import { createTextVNode, getCurrentInstance } from 'vue'
 import App from '@/App.vue'
 import AppWaterMark from '@/layouts/components/AppWaterMark.vue'
+import { createElementDialogService } from '@/utils/elementDialog'
 
 defineOptions({
   name: 'AppProvider',
@@ -33,13 +38,18 @@ defineOptions({
 
 const appStore = useAppStore()
 
-const GlobalNaiveTool = defineComponent({
-  name: 'GlobalNaiveTool',
+const GlobalUiServices = defineComponent({
+  name: 'GlobalUiServices',
   setup() {
+    const appContext = getCurrentInstance()?.appContext ?? null
+
     window.$loadingBar = useLoadingBar()
-    window.$dialog = useDialog()
-    window.$message = useMessage()
-    window.$notification = useNotification()
+    ElMessage._context = appContext
+    ElMessageBox._context = appContext
+    ElNotification._context = appContext
+    window.$dialog = createElementDialogService(appContext)
+    window.$message = ElMessage
+    window.$notification = ElNotification
     return () => createTextVNode()
   },
 })

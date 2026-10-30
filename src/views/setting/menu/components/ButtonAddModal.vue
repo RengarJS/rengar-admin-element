@@ -1,61 +1,61 @@
 <template>
-  <NModal
-    v-model:show="show"
-    preset="dialog"
-    :title="parent ? '添加按钮' : '编辑按钮'"
-    positive-text="确定"
-    negative-text="取消"
-    :loading
-    @after-leave="handleClose"
-    @positive-click="handleSubmit"
-  >
-    <NForm
+  <ElDialog v-model="show" :title="parent ? '添加按钮' : '编辑按钮'" width="500px" @closed="handleClose">
+    <ElForm
       ref="formRef"
       :model="formData"
       :rules="rules"
       class="my-8"
       size="small"
-      label-placement="left"
+      label-position="left"
       label-width="auto"
     >
-      <NFormItem v-if="parent" label="上级菜单">
-        <NInput :value="parent?.name" disabled />
-      </NFormItem>
+      <ElFormItem v-if="parent" label="上级菜单">
+        <ElInput :model-value="parent?.name" disabled />
+      </ElFormItem>
 
-      <NFormItem label="按钮名称" path="name">
-        <NInput v-model:value="formData.name" placeholder="按钮名称" />
-      </NFormItem>
+      <ElFormItem label="按钮名称" prop="name">
+        <ElInput v-model="formData.name" placeholder="按钮名称" @input="validateFieldOnInput('name')" />
+      </ElFormItem>
 
-      <NFormItem label="排序" path="sort">
-        <NInputNumber v-model:value="formData.sort" :min="1" :precision="0" placeholder="排序" />
-      </NFormItem>
+      <ElFormItem label="排序" prop="sort">
+        <ElInputNumber
+          v-model="formData.sort"
+          :min="1"
+          :precision="0"
+          placeholder="排序"
+          @change="validateFieldOnInput('sort')"
+        />
+      </ElFormItem>
 
-      <NFormItem label="状态" path="status">
-        <NRadioGroup v-model:value="formData.status">
-          <NRadio :value="1">启用</NRadio>
-          <NRadio :value="0">禁用</NRadio>
-        </NRadioGroup>
-      </NFormItem>
+      <ElFormItem label="状态" prop="status">
+        <ElRadioGroup v-model="formData.status">
+          <ElRadio :value="1">启用</ElRadio>
+          <ElRadio :value="0">禁用</ElRadio>
+        </ElRadioGroup>
+      </ElFormItem>
 
-      <NFormItem label="权限">
-        <NSelect
-          v-model:value="formData.permissionId"
-          clearable
-          :options="permissionOptions"
-          label-field="path"
-          value-field="id"
-          filterable
-        ></NSelect>
-      </NFormItem>
-    </NForm>
-  </NModal>
+      <ElFormItem label="权限">
+        <ElSelect v-model="formData.permissionId" clearable filterable>
+          <ElOption
+            v-for="permission in permissionOptions"
+            :key="permission.id"
+            :label="permission.path"
+            :value="permission.id"
+          />
+        </ElSelect>
+      </ElFormItem>
+    </ElForm>
+    <template #footer>
+      <ElButton @click="show = false">取消</ElButton>
+      <ElButton type="primary" :loading="loading" @click="handleConfirm">确定</ElButton>
+    </template>
+  </ElDialog>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { menuAddApi, menuEditApi, menuDetailApi } from '@/api/setting/menu'
 import { permissionEnabledListApi } from '@/api/setting/permission'
-
-import { type FormRules, type FormInst } from 'naive-ui'
+import type { FormInstance, FormRules } from 'element-plus'
 import { to } from 'await-to-js'
 
 const show = defineModel<boolean>('show', {
@@ -95,11 +95,16 @@ async function getDetail() {
   formData.value = res
 }
 
-const formRef = useTemplateRef<FormInst>('formRef')
+const formRef = useTemplateRef<FormInstance>('formRef')
 const rules: FormRules = {
-  name: [{ required: true, message: '请输入菜单名称', trigger: ['blur', 'input'] }],
-  sort: [{ required: true, message: '请输入排序', type: 'number', trigger: ['blur', 'input'] }],
+  name: [{ required: true, message: '请输入菜单名称', trigger: ['blur', 'change'] }],
+  sort: [{ required: true, message: '请输入排序', type: 'number', trigger: ['blur', 'change'] }],
   status: [{ required: true, message: '请选择状态', type: 'number', trigger: ['blur', 'change'] }],
+}
+
+function validateFieldOnInput(field: string) {
+  const validation = formRef.value?.validateField(field)
+  void validation?.catch(() => {})
 }
 
 const loading = ref(false)
@@ -120,6 +125,12 @@ async function handleSubmit() {
   window.$message?.success(`${parent ? '新增' : '编辑'}成功`)
   emit('success')
   return true
+}
+
+async function handleConfirm() {
+  if (await handleSubmit()) {
+    show.value = false
+  }
 }
 
 function handleClose() {

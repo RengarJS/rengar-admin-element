@@ -1,38 +1,29 @@
 <template>
-  <NModal
-    v-model:show="show"
-    preset="card"
-    embedded
-    title="搜索"
-    :bordered="false"
-    style="width: 100%; max-width: 600px; position: fixed; top: 20px; left: 0; right: 0; margin: 0 auto"
-  >
-    <div ref="modalRef">
-      <NInput
+  <ElDialog v-model="show" title="搜索" width="min(600px, calc(100vw - 32px))" top="20px" class="app-search-dialog">
+    <div>
+      <ElInput
         clearable
         size="large"
-        v-model:value="searchContent"
+        v-model="searchContent"
         placeholder="搜索菜单页面"
         @keypress.enter="handleEnter"
         @keydown="handleKeyDown"
         @blur="isComposing = false"
-      ></NInput>
+      ></ElInput>
 
       <div v-if="!searchContent && searchHistoryMenus.length" class="mt-6">
         <div class="flex items-center justify-between">
           <div>历史记录</div>
           <div class="text-gray-400">
-            <NButton text size="small" type="primary" @click="menuStore.clearSearchHistoryMenus"> 清空 </NButton>
+            <ElButton text size="small" type="primary" @click="menuStore.clearSearchHistoryMenus"> 清空 </ElButton>
           </div>
         </div>
-        <NCard
+        <ElCard
           v-for="(route, index) in searchHistoryMenus"
-          :ref="(el) => setCardRef(el as CardInst, index)"
-          size="small"
-          hoverable
           :key="route.name"
+          shadow="hover"
           class="mt-3 cursor-pointer"
-          :content-class="computedContentClass(index)"
+          :body-class="computedContentClass(index)"
           @click="handleClick(route)"
         >
           <div class="flex items-center gap-3 text-base">
@@ -42,19 +33,17 @@
           </div>
 
           <div @click.stop="menuStore.removeSearchHistoryMenu(route)" class="i-ant-design:close-outlined"></div>
-        </NCard>
+        </ElCard>
       </div>
-      <NEmpty v-if="!searchHistoryMenus.length && !searchRoutes.length" description="暂无数据" class="mt-6"></NEmpty>
+      <ElEmpty v-if="!searchHistoryMenus.length && !searchRoutes.length" description="暂无数据" class="mt-6" />
       <div v-if="searchRoutes.length" class="mt-6">
-        <NCard
+        <ElCard
           v-for="(route, index) in searchRoutes"
-          :ref="(el) => setCardRef(el as CardInst, index)"
-          size="small"
-          hoverable
           :key="route.name"
+          shadow="hover"
           :class="[index > 0 ? 'mt-3' : '']"
           class="cursor-pointer"
-          :content-class="computedContentClass(index)"
+          :body-class="computedContentClass(index)"
           @click="handleClick(route)"
         >
           <div class="flex items-center gap-3 text-base">
@@ -64,7 +53,7 @@
           </div>
 
           <div class="i-ant-design:enter-outlined"></div>
-        </NCard>
+        </ElCard>
       </div>
     </div>
 
@@ -90,7 +79,7 @@
         <div>关闭</div>
       </div>
     </template>
-  </NModal>
+  </ElDialog>
 </template>
 
 <script setup lang="ts">
@@ -98,9 +87,6 @@ import { useMenuStore } from '@/stores'
 import { useRouterHook } from '@/hooks/router'
 import { useMagicKeys, whenever } from '@vueuse/core'
 import type { RouteRecordRaw } from 'vue-router'
-import type { NCard } from 'naive-ui'
-
-type CardInst = InstanceType<typeof NCard>
 
 const show = defineModel<boolean>('show', {
   required: true,
@@ -112,7 +98,6 @@ const { menuRoutes, searchHistoryMenus } = storeToRefs(menuStore)
 
 const searchContent = ref('')
 const activeIndex = ref(-1) // 修改默认值为-1，表示无选中项
-const cardRefs = ref<CardInst[]>([])
 
 let isComposing = false
 function handleKeyDown(e: KeyboardEvent) {
@@ -217,12 +202,6 @@ function handleRemove(route: RouteRecordRaw) {
 }
 
 const { routerPushByName } = useRouterHook()
-
-function setCardRef(el: CardInst | null, index: number) {
-  if (!cardRefs.value[index]) {
-    cardRefs.value[index] = el as never
-  }
-}
 
 function handleEnter() {
   if (searchContent.value && searchRoutes.value.length > 0) {

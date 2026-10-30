@@ -1,33 +1,33 @@
 <template>
-  <NModal
-    v-model:show="show"
-    preset="dialog"
+  <ElDialog
+    v-model="show"
     :title="record ? '编辑角色' : '新增角色'"
-    positive-text="确定"
-    negative-text="取消"
-    :loading
-    @after-enter="handleOpen"
-    @after-leave="handleClose"
-    @positive-click="handleSubmit"
+    width="500px"
+    @opened="handleOpen"
+    @closed="handleClose"
   >
-    <NForm ref="formRef" :model="formData" :rules class="my-8" size="small" label-placement="left" label-width="auto">
-      <NFormItem label="角色名称" path="name">
-        <NInput v-model:value="formData.name" placeholder="角色名称" />
-      </NFormItem>
+    <ElForm ref="formRef" :model="formData" :rules class="my-8" size="small" label-position="left" label-width="auto">
+      <ElFormItem label="角色名称" prop="name">
+        <ElInput v-model="formData.name" placeholder="角色名称" @input="validateFieldOnInput('name')" />
+      </ElFormItem>
 
-      <NFormItem label="状态" path="status">
-        <NRadioGroup v-model:value="formData.status">
-          <NRadio :value="1">启用</NRadio>
-          <NRadio :value="0">禁用</NRadio>
-        </NRadioGroup>
-      </NFormItem>
-    </NForm>
-  </NModal>
+      <ElFormItem label="状态" prop="status">
+        <ElRadioGroup v-model="formData.status">
+          <ElRadio :value="1">启用</ElRadio>
+          <ElRadio :value="0">禁用</ElRadio>
+        </ElRadioGroup>
+      </ElFormItem>
+    </ElForm>
+    <template #footer>
+      <ElButton @click="show = false">取消</ElButton>
+      <ElButton type="primary" :loading="loading" @click="handleConfirm">确定</ElButton>
+    </template>
+  </ElDialog>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { roleAddApi, roleEditApi } from '@/api/setting/role'
-import { type FormRules, type FormInst } from 'naive-ui'
+import type { FormInstance, FormRules } from 'element-plus'
 import { to } from 'await-to-js'
 
 const show = defineModel<boolean>('show', {
@@ -48,10 +48,15 @@ const formData = ref<Api.Setting.Role>({
   status: 1,
 })
 
-const formRef = useTemplateRef<FormInst>('formRef')
+const formRef = useTemplateRef<FormInstance>('formRef')
 const rules: FormRules = {
-  name: [{ required: true, message: '请输入角色名称', trigger: ['blur', 'input'] }],
+  name: [{ required: true, message: '请输入角色名称', trigger: ['blur', 'change'] }],
   status: [{ required: true, message: '请选择状态', type: 'number', trigger: ['blur', 'change'] }],
+}
+
+function validateFieldOnInput(field: string) {
+  const validation = formRef.value?.validateField(field)
+  void validation?.catch(() => {})
 }
 
 function handleOpen() {
@@ -79,6 +84,12 @@ async function handleSubmit() {
   window.$message?.success(`${record ? '编辑' : '新增'}成功`)
   emit('success')
   return true
+}
+
+async function handleConfirm() {
+  if (await handleSubmit()) {
+    show.value = false
+  }
 }
 </script>
 

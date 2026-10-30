@@ -1,7 +1,7 @@
 <template>
-  <NCard class="h-full">
-    <iframe src="https://ashuicoder.github.io/naive-ui-components/" class="size-full"></iframe>
-  </NCard>
+  <ElCard class="h-full">
+    <iframe src="https://element-plus.org/zh-CN/component/overview" class="size-full"></iframe>
+  </ElCard>
 </template>
 
 <script setup lang="ts"></script>

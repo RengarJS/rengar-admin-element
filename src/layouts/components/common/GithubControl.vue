@@ -1,12 +1,9 @@
 <template>
-  <NTooltip v-if="appStore.isPc" placement="bottom">
-    <template #trigger>
-      <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="jumpToGithub">
-        <IMdiGithub></IMdiGithub>
-      </div>
-    </template>
-    <span>github</span>
-  </NTooltip>
+  <ElTooltip v-if="appStore.isPc" placement="bottom" content="github">
+    <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="jumpToGithub">
+      <IMdiGithub></IMdiGithub>
+    </div>
+  </ElTooltip>
   <div v-else class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="jumpToGithub">
     <IMdiGithub></IMdiGithub>
   </div>

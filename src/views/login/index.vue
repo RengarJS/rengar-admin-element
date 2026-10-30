@@ -1,6 +1,6 @@
 <template>
   <div class="relative overflow-hidden bg-primary-100 h-screen dark:bg-primary-900">
-    <NCard class="absolute-center z-1 max-w-400px w-[90%]" size="large" :bordered="false" round hoverable>
+    <ElCard class="login-card absolute-center z-1 max-w-400px w-[90%]" shadow="hover">
       <div class="flex-center text-2xl text-primary">
         <ThemeControl />
       </div>
@@ -10,53 +10,58 @@
         <div class="text-3xl">{{ title }}</div>
       </div>
 
-      <NForm :model="formData" ref="formRef" :rules label-placement="left" label-width="auto" size="large" class="mt-6">
-        <NFormItem path="username">
-          <NInput
-            v-model:value="formData.username"
+      <ElForm
+        ref="formRef"
+        :model="formData"
+        :rules="rules"
+        label-position="left"
+        label-width="auto"
+        size="large"
+        class="mt-6"
+        @submit.prevent="handleSubmit"
+      >
+        <ElFormItem prop="username">
+          <ElInput
+            v-model="formData.username"
             placeholder="请输入用户名"
             clearable
-            :theme-overrides="{
-              borderRadius: '6px',
-            }"
+            @input="validateFieldOnInput('username')"
+            style="--el-input-border-radius: 6px"
           />
-        </NFormItem>
-        <NFormItem path="password">
-          <NInput
-            v-model:value="formData.password"
+        </ElFormItem>
+        <ElFormItem prop="password">
+          <ElInput
+            v-model="formData.password"
             placeholder="请输入密码"
             clearable
-            show-password-on="mousedown"
+            show-password
             type="password"
-            :theme-overrides="{
-              borderRadius: '6px',
-            }"
+            @input="validateFieldOnInput('password')"
+            style="--el-input-border-radius: 6px"
           />
-        </NFormItem>
+        </ElFormItem>
 
-        <NFormItem path="captchaCode">
+        <ElFormItem prop="captchaCode">
           <div class="h-full w-full flex gap-4">
-            <NInput
+            <ElInput
+              v-model="formData.captchaCode"
               class="flex-1"
-              v-model:value="formData.captchaCode"
               placeholder="请输入验证码"
               clearable
-              show-password-on="mousedown"
-              :theme-overrides="{
-                borderRadius: '6px',
-              }"
+              @input="validateFieldOnInput('captchaCode')"
+              style="--el-input-border-radius: 6px"
             />
 
-            <NSpin :show="captchaLoading">
-              <img class="h-10 w-[120px] cursor-pointer" :src="captchaImage" @click="getChapter" />
-            </NSpin>
+            <div v-loading="captchaLoading" class="captcha-image-container">
+              <img class="h-10 w-[120px] cursor-pointer" :src="captchaImage" alt="验证码" @click="getChapter" />
+            </div>
           </div>
-        </NFormItem>
-        <NFormItem>
-          <NButton type="primary" :loading attr-type="submit" round block @click="handleSubmit">登录</NButton>
-        </NFormItem>
-      </NForm>
-    </NCard>
+        </ElFormItem>
+        <ElFormItem>
+          <ElButton type="primary" :loading="loading" native-type="submit" round class="w-full">登录</ElButton>
+        </ElFormItem>
+      </ElForm>
+    </ElCard>
     <TopWave />
     <BottomWave />
     <FooterInfo />
@@ -68,11 +73,12 @@ import { to } from 'await-to-js'
 import { useAuthStore } from '@/stores'
 import { useLoading } from '@/hooks/loading'
 import { generateCaptchaApi } from '@/api/common/capcha'
-import type { FormInst, FormRules } from 'naive-ui'
+import type { FormInstance, FormRules } from 'element-plus'
 import BottomWave from './components/BottomWave.vue'
 import TopWave from './components/TopWave.vue'
 import ThemeControl from '@/layouts/components/common/ThemeControl.vue'
 import FooterInfo from './components/FooterInfo.vue'
+
 const title = import.meta.env.VITE_APP_TITLE
 
 const formData = reactive({
@@ -81,23 +87,28 @@ const formData = reactive({
   captchaId: 0,
   captchaCode: '',
 })
-const formRef = useTemplateRef<FormInst>('formRef')
+const formRef = useTemplateRef<FormInstance>('formRef')
 const rules: FormRules = {
   username: {
     required: true,
-    trigger: ['input', 'blur'],
+    trigger: ['change', 'blur'],
     message: '请输入用户名',
   },
   password: {
     required: true,
-    trigger: ['input', 'blur'],
+    trigger: ['change', 'blur'],
     message: '请输入密码',
   },
   captchaCode: {
     required: true,
-    trigger: ['input', 'blur'],
+    trigger: ['change', 'blur'],
     message: '请输入验证码',
   },
+}
+
+function validateFieldOnInput(field: string) {
+  const validation = formRef.value?.validateField(field)
+  void validation?.catch(() => {})
 }
 
 const captchaLoading = ref(false)
@@ -143,4 +154,18 @@ async function handleSubmit() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.login-card {
+  border: none;
+  border-radius: 12px;
+}
+
+.captcha-image-container {
+  width: 120px;
+  height: 40px;
+}
+
+:deep(.login-card .el-card__body) {
+  padding: 24px;
+}
+</style>

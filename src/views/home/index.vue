@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 欢迎问候语 -->
-    <NCard class="mb-4 from-primary-100 to-primary-50 bg-gradient-to-r dark:from-primary-500 dark:to-primary-200">
+    <ElCard class="mb-4 from-primary-100 to-primary-50 bg-gradient-to-r dark:from-primary-500 dark:to-primary-200">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-3">
           <SvgIcon icon="mdi:hand-wave" class="text-4xl text-yellow-500" />
@@ -10,35 +10,35 @@
             <p class="mt-2 text-sm text-gray-600">今天是 {{ currentDate }} {{ getWeekDay() }}，祝您工作愉快！</p>
           </div>
         </div>
-        <NButton type="primary" size="small" @click="refreshData">
+        <ElButton type="primary" size="small" @click="refreshData">
           <template #icon>
             <SvgIcon icon="mdi:refresh" />
           </template>
           刷新数据
-        </NButton>
+        </ElButton>
       </div>
-    </NCard>
+    </ElCard>
 
     <!-- 待办事项 -->
-    <NCard class="mb-4 from-blue-50 to-blue-100 bg-gradient-to-r dark:from-blue-800">
+    <ElCard class="mb-4 from-blue-50 to-blue-100 bg-gradient-to-r dark:from-blue-800">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <SvgIcon icon="mdi:clipboard-check" class="text-3xl text-blue-500" />
           <h3 class="text-lg font-bold">今日待办</h3>
         </div>
         <div class="flex gap-2">
-          <NButton quaternary size="small" @click="addTodo">
+          <ElButton text size="small" @click="addTodo">
             <template #icon>
               <SvgIcon icon="mdi:plus" />
             </template>
             添加任务
-          </NButton>
-          <NButton quaternary size="small" @click="clearCompletedTodos">
+          </ElButton>
+          <ElButton text size="small" @click="clearCompletedTodos">
             <template #icon>
               <SvgIcon icon="mdi:delete-sweep" />
             </template>
             清除已完成
-          </NButton>
+          </ElButton>
         </div>
       </div>
 
@@ -52,13 +52,13 @@
                 'hover:shadow-md',
               ]"
             >
-              <NCheckbox v-model:checked="todo.completed" @update:checked="updateTodoStatus(index)" />
+              <ElCheckbox v-model="todo.completed" @change="updateTodoStatus(index)" />
               <div class="ml-3 flex-1" :class="{ 'line-through text-gray-400': todo.completed }">
                 {{ todo.text }}
               </div>
               <div class="mr-2 text-xs text-gray-400">{{ todo.date }}</div>
-              <NButton
-                quaternary
+              <ElButton
+                text
                 circle
                 size="small"
                 class="opacity-0 transition-opacity group-hover:opacity-100"
@@ -67,7 +67,7 @@
                 <template #icon>
                   <SvgIcon icon="mdi:delete" />
                 </template>
-              </NButton>
+              </ElButton>
             </div>
           </li>
         </TransitionGroup>
@@ -78,23 +78,19 @@
         </div>
       </div>
 
-      <NModal
-        v-model:show="showAddTodoModal"
-        preset="dialog"
-        title="添加新任务"
-        positive-text="确认"
-        negative-text="取消"
-        @positive-click="confirmAddTodo"
-        @negative-click="cancelAddTodo"
-      >
-        <NInput v-model:value="newTodoText" placeholder="请输入任务内容" @keyup.enter="confirmAddTodo" />
-      </NModal>
-    </NCard>
+      <ElDialog v-model="showAddTodoModal" title="添加新任务" width="500px">
+        <ElInput v-model="newTodoText" placeholder="请输入任务内容" @keyup.enter="confirmAddTodo" />
+        <template #footer>
+          <ElButton @click="cancelAddTodo">取消</ElButton>
+          <ElButton type="primary" @click="confirmAddTodo">确认</ElButton>
+        </template>
+      </ElDialog>
+    </ElCard>
 
-    <NGrid cols="1  600:2 1000:4" :x-gap="16" :y-gap="16">
+    <div class="stats-grid">
       <!-- 统计卡片 -->
-      <NGridItem class="col-span-24 lg:col-span-6 md:col-span-12 sm:col-span-12">
-        <NCard class="h-full from-blue-50 to-blue-100 bg-gradient-to-r">
+      <div>
+        <ElCard class="h-full from-blue-50 to-blue-100 bg-gradient-to-r">
           <div class="flex items-center justify-between">
             <div>
               <div class="text-lg text-black font-bold">项目总数</div>
@@ -105,11 +101,11 @@
             </div>
           </div>
           <div class="mt-4 text-sm text-gray-500">较昨日 +2 个项目</div>
-        </NCard>
-      </NGridItem>
+        </ElCard>
+      </div>
 
-      <NGridItem class="col-span-24 lg:col-span-6 md:col-span-12 sm:col-span-12">
-        <NCard class="h-full from-green-50 to-green-100 bg-gradient-to-r">
+      <div>
+        <ElCard class="h-full from-green-50 to-green-100 bg-gradient-to-r">
           <div class="flex items-center justify-between">
             <div>
               <div class="text-lg text-black font-bold">活跃用户</div>
@@ -120,11 +116,11 @@
             </div>
           </div>
           <div class="mt-4 text-sm text-gray-500">较昨日 +12%</div>
-        </NCard>
-      </NGridItem>
+        </ElCard>
+      </div>
 
-      <NGridItem class="col-span-24 lg:col-span-6 md:col-span-12 sm:col-span-12">
-        <NCard class="h-full from-yellow-50 to-yellow-100 bg-gradient-to-r">
+      <div>
+        <ElCard class="h-full from-yellow-50 to-yellow-100 bg-gradient-to-r">
           <div class="flex items-center justify-between">
             <div>
               <div class="text-lg text-black font-bold">系统消息</div>
@@ -135,11 +131,11 @@
             </div>
           </div>
           <div class="mt-4 text-sm text-gray-500">较昨日 +48 条</div>
-        </NCard>
-      </NGridItem>
+        </ElCard>
+      </div>
 
-      <NGridItem class="col-span-24 lg:col-span-6 md:col-span-12 sm:col-span-12">
-        <NCard class="h-full from-red-50 to-red-100 bg-gradient-to-r">
+      <div>
+        <ElCard class="h-full from-red-50 to-red-100 bg-gradient-to-r">
           <div class="flex items-center justify-between">
             <div>
               <div class="text-lg text-black font-bold">错误日志</div>
@@ -150,29 +146,29 @@
             </div>
           </div>
           <div class="mt-4 text-sm text-gray-500">较昨日 -25%</div>
-        </NCard>
-      </NGridItem>
-    </NGrid>
+        </ElCard>
+      </div>
+    </div>
 
-    <NGrid responsive="screen" cols="1 s:2" :x-gap="16" :y-gap="16" class="mt-4">
+    <div class="chart-grid mt-4">
       <!-- 图表区域 -->
-      <NGridItem class="col-span-24 lg:col-span-16 md:col-span-24">
-        <NCard title="访问量趋势" class="h-full">
+      <div>
+        <ElCard title="访问量趋势" class="h-full">
           <VChart class="h-80 w-full" animate :option="visitOption" autoresize />
-        </NCard>
-      </NGridItem>
+        </ElCard>
+      </div>
 
-      <NGridItem class="col-span-24 lg:col-span-8 md:col-span-24">
-        <NCard title="用户分布" class="h-full">
+      <div>
+        <ElCard title="用户分布" class="h-full">
           <VChart class="h-80 w-full" :option="pieOption" autoresize />
-        </NCard>
-      </NGridItem>
-    </NGrid>
+        </ElCard>
+      </div>
+    </div>
 
-    <NCard title="技术栈" class="mt-4">
-      <NGrid cols="1 600:2  1000:4" :x-gap="16" :y-gap="16" class="mt-4">
-        <NGridItem v-for="(tech, index) in techStacks" :key="index">
-          <NCard class="h-full cursor-pointer transition-all duration-300 hover:shadow-lg" @click="openLink(tech.url)">
+    <ElCard title="技术栈" class="mt-4">
+      <div class="tech-grid mt-4">
+        <div v-for="(tech, index) in techStacks" :key="index">
+          <ElCard class="h-full cursor-pointer transition-all duration-300 hover:shadow-lg" @click="openLink(tech.url)">
             <div class="flex items-center gap-3">
               <div class="text-3xl" :class="tech.color">
                 <SvgIcon icon="material-symbols:tools-wrench-outline" class="text-primary" />
@@ -182,10 +178,10 @@
                 <div class="mt-3 text-sm text-gray-600">{{ tech.description }}</div>
               </div>
             </div>
-          </NCard>
-        </NGridItem>
-      </NGrid>
-    </NCard>
+          </ElCard>
+        </div>
+      </div>
+    </ElCard>
   </div>
 </template>
 
@@ -196,9 +192,6 @@ import { LineChart, PieChart } from 'echarts/charts'
 import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 import { ref, computed, onMounted, watch } from 'vue'
-
-// 导入Naive UI组件
-import { NCard, NButton, NGrid, NGridItem, NCheckbox, NModal, NInput } from 'naive-ui'
 
 // 导入用户认证存储
 import { useAuthStore } from '@/stores'
@@ -609,6 +602,39 @@ watch(
 </script>
 
 <style scoped>
+.stats-grid,
+.tech-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .stats-grid,
+  .tech-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 640px) {
+  .chart-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .stats-grid,
+  .tech-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(155, 155, 155, 0.5) transparent;

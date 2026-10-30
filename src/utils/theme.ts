@@ -12,6 +12,14 @@ export function injectTailwindCssVarToGlobal(color: string, key = 'primary') {
       colors[colorKey as ThemeColorValue],
     )
   }
+
+  if (key === 'primary') {
+    const primaryColorRgb = [1, 3, 5]
+      .map((start) => Number.parseInt(colors.DEFAULT.slice(start, start + 2), 16))
+      .join(', ')
+    root.style.setProperty('--el-color-primary-rgb', primaryColorRgb)
+  }
+
   appStore.themeOverrides.common = {
     primaryColor: colors.DEFAULT,
     primaryColorHover: colors['400'],

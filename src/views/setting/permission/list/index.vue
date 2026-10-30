@@ -1,69 +1,39 @@
 <template>
-  <NCard>
-    <NDataTable class="mt-4" :columns :data="tableData" :loading remote :pagination :scroll-x="620"></NDataTable>
-  </NCard>
+  <ElCard>
+    <ElTable class="mt-4" style="min-width: 620px" v-loading="loading" :data="tableData">
+      <ElTableColumn prop="id" label="id" width="120" />
+      <ElTableColumn prop="name" label="权限名" />
+      <ElTableColumn prop="path" label="路由" />
+      <ElTableColumn label="状态" width="120">
+        <template #default="{ row }">
+          <ElTag :type="row.status === 1 ? 'success' : 'danger'">
+            {{ row.status === 1 ? '启用' : '禁用' }}
+          </ElTag>
+        </template>
+      </ElTableColumn>
+    </ElTable>
+    <ElPagination
+      v-model:current-page="pagination.page"
+      class="mt-4 flex justify-end"
+      :page-size="pagination.pageSize"
+      :total="pagination.itemCount"
+      layout="total, prev, pager, next"
+      @current-change="handlePageChange"
+    />
+  </ElCard>
 </template>
 
-<script setup lang="tsx">
-import { NTag, type DataTableColumns } from 'naive-ui'
+<script setup lang="ts">
 import { permissionPageListApi } from '@/api/setting/permission'
 import { to } from 'await-to-js'
 
 const loading = ref(false)
 const tableData = ref<Api.Setting.Permission[]>([])
-const columns: DataTableColumns<Api.Setting.Permission> = [
-  {
-    title: 'id',
-    key: 'id',
-    width: 120,
-  },
-  {
-    title: '权限名',
-    key: 'name',
-  },
-  {
-    title: '路由',
-    key: 'path',
-  },
-  {
-    title: '状态',
-    key: 'status',
-    width: 120,
-    render(row) {
-      return <NTag type={row.status === 1 ? 'success' : 'error'}>{row.status === 1 ? '启用' : '禁用'}</NTag>
-    },
-  },
-  // {
-  //   title: '操作',
-  //   key: 'operation',
-  //   width: 260,
-  //   fixed: 'right',
-  //   render(row) {
-  //     return (
-  //       <NSpace>
-  //         <NButton type="primary" onClick={() => handleEdit(row)}>
-  //           编辑
-  //         </NButton>
-  //         <NButton type="primary" onClick={() => handlePassword(row)}>
-  //           修改密码
-  //         </NButton>
-  //         <NButton type="error" onClick={() => handleDelete(row)}>
-  //           删除
-  //         </NButton>
-  //       </NSpace>
-  //     )
-  //   },
-  // },
-]
 
 const pagination = reactive({
   page: 1,
   pageSize: 10,
   itemCount: 0,
-  onChange: (page: number) => {
-    pagination.page = page
-    getPageList()
-  },
 })
 
 async function getPageList() {
@@ -84,6 +54,11 @@ async function getPageList() {
 }
 
 getPageList()
+
+function handlePageChange(page: number) {
+  pagination.page = page
+  getPageList()
+}
 </script>
 
 <style scoped></style>

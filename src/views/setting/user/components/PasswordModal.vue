@@ -1,30 +1,34 @@
 <template>
-  <NModal
-    v-model:show="show"
-    preset="dialog"
-    title="修改密码"
-    positive-text="确定"
-    negative-text="取消"
-    :loading
-    @after-enter="handleOpen"
-    @after-leave="handleClose"
-    @positive-click="handleSubmit"
-  >
-    <NForm ref="formRef" :model="formValue" :rules class="my-8" size="small" label-placement="left" label-width="auto">
-      <NFormItem path="newPassword" label="新密码">
-        <NInput v-model:value="formValue.newPassword" type="password" placeholder="请输入新密码" />
-      </NFormItem>
-      <NFormItem path="confirmPassword" label="确认密码">
-        <NInput v-model:value="formValue.confirmPassword" type="password" placeholder="请再次输入新密码" />
-      </NFormItem>
-    </NForm>
-  </NModal>
+  <ElDialog v-model="show" title="修改密码" width="400px" @opened="handleOpen" @closed="handleClose">
+    <ElForm ref="formRef" :model="formValue" :rules class="my-4" size="small" label-position="left" label-width="auto">
+      <ElFormItem prop="newPassword" label="新密码">
+        <ElInput
+          v-model="formValue.newPassword"
+          type="password"
+          placeholder="请输入新密码"
+          @input="validateFieldOnInput('newPassword')"
+        />
+      </ElFormItem>
+      <ElFormItem prop="confirmPassword" label="确认密码">
+        <ElInput
+          v-model="formValue.confirmPassword"
+          type="password"
+          placeholder="请再次输入新密码"
+          @input="validateFieldOnInput('confirmPassword')"
+        />
+      </ElFormItem>
+    </ElForm>
+    <template #footer>
+      <ElButton @click="show = false">取消</ElButton>
+      <ElButton type="primary" :loading="loading" @click="handleConfirm">确定</ElButton>
+    </template>
+  </ElDialog>
 </template>
 
 <script setup lang="tsx">
 import { userPasswordApi } from '@/api/setting/user'
 
-import { type FormRules, type FormInst } from 'naive-ui'
+import type { FormInstance, FormRules } from 'element-plus'
 import { to } from 'await-to-js'
 
 const show = defineModel<boolean>('show', {
@@ -40,25 +44,27 @@ const formValue = ref<Api.Setting.PasswordDTO>({
   newPassword: '',
   confirmPassword: '',
 })
-const formRef = useTemplateRef<FormInst>('formRef')
+const formRef = useTemplateRef<FormInstance>('formRef')
 const rules: FormRules = {
   newPassword: {
     required: true,
     message: '请输入新密码',
-    trigger: ['blur', 'input'],
+    trigger: ['blur', 'change'],
   },
   confirmPassword: {
     required: true,
-    validator: (_, value: string) => {
+    validator: (_, value, callback) => {
       if (!value) {
-        return new Error('请再次输入新密码')
+        callback(new Error('请再次输入新密码'))
+        return
       }
       if (value !== formValue.value.newPassword) {
-        return new Error('两次输入的密码不一致')
+        callback(new Error('两次输入的密码不一致'))
+        return
       }
-      return true
+      callback()
     },
-    trigger: ['blur', 'input'],
+    trigger: ['blur', 'change'],
   },
 }
 
@@ -68,6 +74,11 @@ function handleClose() {
     newPassword: '',
     confirmPassword: '',
   }
+}
+
+function validateFieldOnInput(field: string) {
+  const validation = formRef.value?.validateField(field)
+  void validation?.catch(() => {})
 }
 
 function handleOpen() {
@@ -86,6 +97,12 @@ async function handleSubmit() {
   if (err) return
   window.$message?.success('修改密码成功')
   return true
+}
+
+async function handleConfirm() {
+  if (await handleSubmit()) {
+    show.value = false
+  }
 }
 </script>
 

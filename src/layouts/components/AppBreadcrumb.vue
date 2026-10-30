@@ -1,14 +1,14 @@
 <template>
-  <NBreadcrumb>
-    <NBreadcrumbItem v-for="item in breadcrumb" :clickable="false" :key="item.name">
+  <ElBreadcrumb>
+    <ElBreadcrumbItem v-for="item in breadcrumb" :key="item.name">
       <div class="flex items-center gap-1">
-        <NIcon>
+        <ElIcon>
           <MenuIcon :options="item.meta"></MenuIcon>
-        </NIcon>
+        </ElIcon>
         <span> {{ item.meta.title }}</span>
       </div>
-    </NBreadcrumbItem>
-  </NBreadcrumb>
+    </ElBreadcrumbItem>
+  </ElBreadcrumb>
 </template>
 
 <script setup lang="ts">

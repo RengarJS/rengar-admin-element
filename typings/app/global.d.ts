@@ -1,9 +1,12 @@
 export {}
+
+import type { ElementDialogService } from '@/utils/elementDialog'
+
 declare global {
   interface Window {
     $loadingBar?: import('naive-ui').LoadingBarProviderInst
-    $dialog: import('naive-ui').DialogProviderInst
-    $message: import('naive-ui').MessageProviderInst
-    $notification: import('naive-ui').NotificationProviderInst
+    $dialog: ElementDialogService
+    $message: typeof import('element-plus').ElMessage
+    $notification: typeof import('element-plus').ElNotification
   }
 }

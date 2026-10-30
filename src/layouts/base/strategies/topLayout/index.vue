@@ -1,62 +1,39 @@
 <template>
-  <NLayout embedded has-sider class="h-screen">
-    <NLayout>
-      <NLayoutHeader
-        :inverted="userConfig.invertedHeader"
-        bordered
-        :style="{
-          height: numberToPx(userConfig.headerHeight),
-        }"
-      >
-        <AppHeader :show-logo="true" :show-aside-control="showAsideControl">
-          <SysMenu
-            v-if="isPc"
-            :inverted="userConfig.invertedHeader"
-            mode="horizontal"
-            :data="menuStore.menuRoutes"
-            v-model:active="menuStore.activeMenu"
-          >
-          </SysMenu>
-        </AppHeader>
-      </NLayoutHeader>
-      <NLayoutHeader
-        v-if="userConfig.showTabs"
-        bordered
-        :style="{
-          height: numberToPx(userConfig.tabHeight),
-        }"
-      >
-        <AppTabs />
-      </NLayoutHeader>
+  <ElContainer direction="vertical" class="overflow-hidden h-screen">
+    <ElHeader
+      :height="numberToPx(userConfig.headerHeight)"
+      class="layout-header"
+      :class="{ 'is-inverted': userConfig.invertedHeader }"
+    >
+      <AppHeader :show-logo="true" :show-aside-control="showAsideControl">
+        <SysMenu
+          v-if="isPc"
+          :inverted="userConfig.invertedHeader"
+          mode="horizontal"
+          :data="menuStore.menuRoutes"
+          v-model:active="menuStore.activeMenu"
+        />
+      </AppHeader>
+    </ElHeader>
+    <ElHeader v-if="userConfig.showTabs" :height="numberToPx(userConfig.tabHeight)" class="layout-header">
+      <AppTabs />
+    </ElHeader>
 
-      <NLayoutContent
-        embedded
-        :native-scrollbar="false"
-        :content-style="{
-          height: '100%',
-        }"
-        position="absolute"
-        :style="layoutContentStyle"
-        :ref="(el) => el && appStore.setLayoutContentRef(el as HTMLElement)"
-      >
-        <AppRouterView v-if="showRouterView" />
-      </NLayoutContent>
-      <NLayoutFooter
-        v-if="userConfig.showFooter"
-        bordered
-        position="absolute"
-        :style="{
-          height: numberToPx(userConfig.footerHeight),
-        }"
-      >
-        <AppFooter />
-      </NLayoutFooter>
-    </NLayout>
+    <ElMain
+      class="layout-main"
+      :style="layoutContentStyle"
+      :ref="(el) => el && appStore.setLayoutContentRef(el as HTMLElement)"
+    >
+      <AppRouterView v-if="showRouterView" />
+    </ElMain>
+    <ElFooter v-if="userConfig.showFooter" :height="numberToPx(userConfig.footerHeight)" class="layout-footer">
+      <AppFooter />
+    </ElFooter>
 
     <AppConfigDrawer v-model:show="showConfigDrawer" />
     <AppMobileDrawer v-model:show="showMenuDrawer" />
     <AppSearchModal v-model:show="showSearchModal" />
-  </NLayout>
+  </ElContainer>
 </template>
 
 <script setup lang="ts">
@@ -75,14 +52,9 @@ const appStore = useAppStore()
 
 const { userConfig, showConfigDrawer, showMenuDrawer, showRouterView, isPc, showSearchModal } = storeToRefs(appStore)
 
-const layoutContentStyle = computed(() => {
-  const style = {
-    top: `calc(${numberToPx(userConfig.value.headerHeight)} + ${userConfig.value.showTabs ? numberToPx(userConfig.value.tabHeight) : '0px'})`,
-    bottom: userConfig.value.showFooter ? numberToPx(userConfig.value.footerHeight) : '0px',
-    padding: numberToPx(userConfig.value.gap),
-  }
-  return style
-})
+const layoutContentStyle = computed(() => ({
+  padding: numberToPx(userConfig.value.gap),
+}))
 
 const menuStore = useMenuStore()
 
@@ -92,4 +64,27 @@ const showAsideControl = computed(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.layout-header {
+  flex-shrink: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.layout-header.is-inverted {
+  color: #f8fafc;
+  background-color: #0f172a;
+}
+
+.layout-main {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.layout-footer {
+  flex-shrink: 0;
+  padding: 0;
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+</style>

@@ -1,11 +1,9 @@
 <template>
-  <NLayout class="h-screen">
-    <NLayoutHeader
-      bordered
-      :inverted="userConfig.invertedHeader"
-      :style="{
-        height: numberToPx(userConfig.headerHeight),
-      }"
+  <ElContainer direction="vertical" class="overflow-hidden h-screen">
+    <ElHeader
+      :height="numberToPx(userConfig.headerHeight)"
+      class="layout-header"
+      :class="{ 'is-inverted': userConfig.invertedHeader }"
     >
       <AppHeader :show-logo="true" :show-aside-control="showAsideControl">
         <SysMenu
@@ -17,25 +15,14 @@
           v-model:active="menuStore.topActiveName"
         />
       </AppHeader>
-    </NLayoutHeader>
+    </ElHeader>
 
-    <NLayout
-      has-sider
-      position="absolute"
-      :style="{
-        top: numberToPx(userConfig.headerHeight),
-        bottom: 0,
-      }"
-    >
-      <NLayoutSider
+    <ElContainer class="layout-body">
+      <ElAside
         v-if="showAppAside"
-        bordered
-        :inverted="userConfig.invertedAside"
-        :native-scrollbar="false"
-        :width="userConfig.asideWidth"
-        collapse-mode="width"
-        :collapsed="systemConfig.asideCollapse"
-        :collapsed-width="systemConfig.asideCollapseWidth"
+        :width="numberToPx(systemConfig.asideCollapse ? systemConfig.asideCollapseWidth : userConfig.asideWidth)"
+        class="layout-aside"
+        :class="{ 'is-inverted': userConfig.invertedAside }"
       >
         <SysMenu
           :inverted="userConfig.invertedAside"
@@ -43,49 +30,31 @@
           :data="menuStore.subMenuRoutes"
           :collapsed="systemConfig.asideCollapse"
         />
-      </NLayoutSider>
+      </ElAside>
 
-      <NLayout>
-        <NLayoutHeader
-          v-if="userConfig.showTabs"
-          bordered
-          :style="{
-            height: numberToPx(userConfig.tabHeight),
-          }"
-        >
+      <ElContainer direction="vertical" class="min-w-0">
+        <ElHeader v-if="userConfig.showTabs" :height="numberToPx(userConfig.tabHeight)" class="layout-header">
           <AppTabs />
-        </NLayoutHeader>
+        </ElHeader>
 
-        <NLayoutContent
-          embedded
-          :native-scrollbar="false"
-          :content-style="{
-            height: '100%',
-          }"
-          position="absolute"
+        <ElMain
+          class="layout-main"
           :style="layoutContentStyle"
           :ref="(el) => el && appStore.setLayoutContentRef(el as HTMLElement)"
         >
           <AppRouterView v-if="showRouterView" />
-        </NLayoutContent>
+        </ElMain>
 
-        <NLayoutFooter
-          v-if="userConfig.showFooter"
-          bordered
-          position="absolute"
-          :style="{
-            height: numberToPx(userConfig.footerHeight),
-          }"
-        >
+        <ElFooter v-if="userConfig.showFooter" :height="numberToPx(userConfig.footerHeight)" class="layout-footer">
           <AppFooter />
-        </NLayoutFooter>
-      </NLayout>
-    </NLayout>
+        </ElFooter>
+      </ElContainer>
+    </ElContainer>
 
     <AppConfigDrawer v-model:show="showConfigDrawer" />
     <AppMobieDrawer v-model:show="showMenuDrawer" />
     <AppSearchModal v-model:show="showSearchModal" />
-  </NLayout>
+  </ElContainer>
 </template>
 
 <script setup lang="ts">
@@ -104,14 +73,9 @@ const appStore = useAppStore()
 const { userConfig, systemConfig, showConfigDrawer, showMenuDrawer, showRouterView, isPc, showSearchModal } =
   storeToRefs(appStore)
 
-const layoutContentStyle = computed(() => {
-  const style = {
-    top: userConfig.value.showTabs ? numberToPx(userConfig.value.tabHeight) : '0px',
-    bottom: userConfig.value.showFooter ? numberToPx(userConfig.value.footerHeight) : '0px',
-    padding: numberToPx(userConfig.value.gap),
-  }
-  return style
-})
+const layoutContentStyle = computed(() => ({
+  padding: numberToPx(userConfig.value.gap),
+}))
 
 const menuStore = useMenuStore()
 
@@ -128,4 +92,43 @@ const showAsideControl = computed(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.layout-body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.layout-aside {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--el-border-color-lighter);
+  transition: width 0.2s ease;
+}
+
+.layout-aside.is-inverted {
+  background-color: #0f172a;
+}
+
+.layout-header {
+  flex-shrink: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.layout-header.is-inverted {
+  color: #f8fafc;
+  background-color: #0f172a;
+}
+
+.layout-main {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.layout-footer {
+  flex-shrink: 0;
+  padding: 0;
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+</style>

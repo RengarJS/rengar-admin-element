@@ -1,25 +1,21 @@
 <template>
-  <NModal
-    v-model:show="show"
-    preset="dialog"
-    positive-text="确定"
-    negative-text="取消"
-    :loading
-    title="修改密码"
-    @positive-click="handleSubmit"
-  >
-    <NForm :model="formValue" :rules label-placement="left" ref="formRef" label-width="auto" class="py-8">
-      <NFormItem path="oldPassword" label="旧密码">
-        <NInput v-model:value="formValue.oldPassword" type="password" placeholder="请输入旧密码" />
-      </NFormItem>
-      <NFormItem path="newPassword" label="新密码">
-        <NInput v-model:value="formValue.newPassword" type="password" placeholder="请输入新密码" />
-      </NFormItem>
-      <NFormItem path="confirmPassword" label="确认密码">
-        <NInput v-model:value="formValue.confirmPassword" type="password" placeholder="请再次输入新密码" />
-      </NFormItem>
-    </NForm>
-  </NModal>
+  <ElDialog v-model="show" title="修改密码" width="400px">
+    <ElForm ref="formRef" :model="formValue" :rules label-position="left" label-width="auto" class="py-4">
+      <ElFormItem prop="oldPassword" label="旧密码">
+        <ElInput v-model="formValue.oldPassword" type="password" placeholder="请输入旧密码" />
+      </ElFormItem>
+      <ElFormItem prop="newPassword" label="新密码">
+        <ElInput v-model="formValue.newPassword" type="password" placeholder="请输入新密码" />
+      </ElFormItem>
+      <ElFormItem prop="confirmPassword" label="确认密码">
+        <ElInput v-model="formValue.confirmPassword" type="password" placeholder="请再次输入新密码" />
+      </ElFormItem>
+    </ElForm>
+    <template #footer>
+      <ElButton @click="show = false">取消</ElButton>
+      <ElButton type="primary" :loading="loading" @click="handleConfirm">确定</ElButton>
+    </template>
+  </ElDialog>
 </template>
 
 <script setup lang="ts">
@@ -28,7 +24,7 @@ import { to } from 'await-to-js'
 import { useRouterHook } from '@/hooks/router'
 import { useLoading } from '@/hooks/loading'
 import { useAuthStore } from '@/stores'
-import type { FormInst, FormRules } from 'naive-ui'
+import type { FormInstance, FormRules } from 'element-plus'
 
 const show = defineModel<boolean>('show', {
   required: true,
@@ -47,14 +43,16 @@ const rules: FormRules = {
   },
   confirmPassword: {
     required: true,
-    validator: (_, value: string) => {
+    validator: (_, value, callback) => {
       if (!value) {
-        return new Error('请再次输入新密码')
+        callback(new Error('请再次输入新密码'))
+        return
       }
       if (value !== formValue.newPassword) {
-        return new Error('两次输入的密码不一致')
+        callback(new Error('两次输入的密码不一致'))
+        return
       }
-      return true
+      callback()
     },
     trigger: ['blur', 'input'],
   },
@@ -65,7 +63,7 @@ const formValue = reactive({
   newPassword: '',
   confirmPassword: '',
 })
-const formRef = useTemplateRef<FormInst>('formRef')
+const formRef = useTemplateRef<FormInstance>('formRef')
 
 const { loading, startLoading, endLoading } = useLoading()
 const { routerReplaceToLogin } = useRouterHook()
@@ -89,6 +87,12 @@ async function handleSubmit() {
   authStore.reset()
   routerReplaceToLogin(router.currentRoute.value.fullPath)
   return true
+}
+
+async function handleConfirm() {
+  if (await handleSubmit()) {
+    show.value = false
+  }
 }
 </script>
 

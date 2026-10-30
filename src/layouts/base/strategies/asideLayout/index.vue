@@ -1,13 +1,10 @@
 <template>
-  <NLayout embedded has-sider class="h-screen">
-    <NLayoutSider
+  <ElContainer class="overflow-hidden h-screen">
+    <ElAside
       v-if="isPc"
-      :inverted="userConfig.invertedAside"
-      :width="userConfig.asideWidth"
-      bordered
-      collapse-mode="width"
-      :collapsed="systemConfig.asideCollapse"
-      :collapsed-width="systemConfig.asideCollapseWidth"
+      :width="numberToPx(systemConfig.asideCollapse ? systemConfig.asideCollapseWidth : userConfig.asideWidth)"
+      class="layout-aside"
+      :class="{ 'is-inverted': userConfig.invertedAside }"
     >
       <div class="h-full w-full flex flex-col">
         <div
@@ -27,56 +24,36 @@
           />
         </div>
       </div>
-    </NLayoutSider>
-    <NLayout>
-      <NLayoutHeader
-        :inverted="userConfig.invertedHeader"
-        bordered
-        :style="{
-          height: numberToPx(userConfig.headerHeight),
-        }"
+    </ElAside>
+    <ElContainer direction="vertical" class="min-w-0">
+      <ElHeader
+        :height="numberToPx(userConfig.headerHeight)"
+        class="layout-header"
+        :class="{ 'is-inverted': userConfig.invertedHeader }"
       >
         <AppHeader :show-logo="!isPc" :show-aside-control="showAsideControl">
           <AppBreadcrumb v-if="showAppBreadcrumb" />
         </AppHeader>
-      </NLayoutHeader>
-      <NLayoutHeader
-        v-if="userConfig.showTabs"
-        bordered
-        :style="{
-          height: numberToPx(userConfig.tabHeight),
-        }"
-      >
+      </ElHeader>
+      <ElHeader v-if="userConfig.showTabs" :height="numberToPx(userConfig.tabHeight)" class="layout-header">
         <AppTabs />
-      </NLayoutHeader>
-      <NLayoutContent
-        embedded
-        :native-scrollbar="false"
-        :content-style="{
-          height: '100%',
-        }"
-        position="absolute"
+      </ElHeader>
+      <ElMain
+        class="layout-main"
         :style="layoutContentStyle"
         :ref="(el) => el && appStore.setLayoutContentRef(el as HTMLElement)"
       >
         <AppRouterView v-if="showRouterView" />
-      </NLayoutContent>
-      <NLayoutFooter
-        v-if="userConfig.showFooter"
-        bordered
-        position="absolute"
-        :style="{
-          height: numberToPx(userConfig.footerHeight),
-        }"
-      >
+      </ElMain>
+      <ElFooter v-if="userConfig.showFooter" :height="numberToPx(userConfig.footerHeight)" class="layout-footer">
         <AppFooter />
-      </NLayoutFooter>
-    </NLayout>
+      </ElFooter>
+    </ElContainer>
 
     <AppConfigDrawer v-model:show="showConfigDrawer" />
     <AppMobieDrawer v-model:show="showMenuDrawer" />
     <AppSearchModal v-model:show="showSearchModal" />
-  </NLayout>
+  </ElContainer>
 </template>
 
 <script setup lang="ts">
@@ -101,8 +78,6 @@ const { userConfig, systemConfig, showConfigDrawer, isMobile, showMenuDrawer, sh
 
 const layoutContentStyle = computed(() => {
   const style = {
-    top: `calc(${numberToPx(userConfig.value.headerHeight)} + ${userConfig.value.showTabs ? numberToPx(userConfig.value.tabHeight) : '0px'})`,
-    bottom: userConfig.value.showFooter ? numberToPx(userConfig.value.footerHeight) : '0px',
     padding: numberToPx(userConfig.value.gap),
   }
   return style
@@ -120,4 +95,38 @@ const showAsideControl = computed(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.layout-aside {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--el-border-color-lighter);
+  transition: width 0.2s ease;
+}
+
+.layout-aside.is-inverted {
+  background-color: #0f172a;
+}
+
+.layout-header {
+  flex-shrink: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.layout-header.is-inverted {
+  color: #f8fafc;
+  background-color: #0f172a;
+}
+
+.layout-main {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.layout-footer {
+  flex-shrink: 0;
+  padding: 0;
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+</style>

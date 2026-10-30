@@ -1,7 +1,7 @@
 <template>
-  <NCard class="h-full">
+  <ElCard class="h-full">
     <iframe src="https://unocss.dev/" class="size-full"></iframe>
-  </NCard>
+  </ElCard>
 </template>
 
 <script setup lang="ts"></script>

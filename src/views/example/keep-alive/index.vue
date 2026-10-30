@@ -1,10 +1,10 @@
 <template>
-  <NCard class="h-full">
-    <NSpace align="center">
-      <NText type="primary">当前计数：{{ count }}</NText>
-      <NButton type="primary" @click="count++">增加</NButton>
-    </NSpace>
-  </NCard>
+  <ElCard class="h-full">
+    <ElSpace align="center">
+      <ElText type="primary">当前计数：{{ count }}</ElText>
+      <ElButton type="primary" @click="count++">增加</ElButton>
+    </ElSpace>
+  </ElCard>
 </template>
 
 <script setup lang="ts">

@@ -1,13 +1,13 @@
 <template>
-  <NTooltip v-if="appStore.isPc" placement="bottom">
-    <template #trigger>
-      <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="toggle">
-        <IOouiExitFullscreen v-if="isFullscreen"></IOouiExitFullscreen>
-        <IOouiFullScreen v-else></IOouiFullScreen>
-      </div>
+  <ElTooltip v-if="appStore.isPc" placement="bottom">
+    <template #content>
+      <span>{{ isFullscreen ? '退出全屏' : '全屏' }}</span>
     </template>
-    <span>{{ isFullscreen ? '退出全屏' : '全屏' }}</span>
-  </NTooltip>
+    <div class="flex-center cursor-pointer rounded-sm p-1 hover:text-primary" @click="toggle">
+      <IOouiExitFullscreen v-if="isFullscreen"></IOouiExitFullscreen>
+      <IOouiFullScreen v-else></IOouiFullScreen>
+    </div>
+  </ElTooltip>
 </template>
 
 <script setup lang="ts">

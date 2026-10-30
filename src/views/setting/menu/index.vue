@@ -1,110 +1,154 @@
 <template>
-  <div>
-    <NGrid cols="1 800:2 1200:3" :x-gap="16" :y-gap="16">
-      <NGridItem>
-        <NSpin :show="menuLoading">
-          <NCard title="菜单管理" size="small">
-            <template #header-extra>
-              <NButton v-role="'btn0001'" type="primary" size="small" @click="handleAddMenu(1)">添加顶级菜单</NButton>
-            </template>
+  <div class="menu-management-grid">
+    <ElCard v-loading="menuLoading">
+      <template #header>
+        <div class="flex items-center justify-between gap-2">
+          <span>菜单管理</span>
+          <ElButton v-role="'btn0001'" type="primary" size="small" @click="handleAddMenu(1)">添加顶级菜单</ElButton>
+        </div>
+      </template>
 
-            <div class="my-4">
-              <NInput v-model:value="pattern" placeholder="搜索菜单" />
-            </div>
+      <div class="my-4">
+        <ElInput v-model="pattern" placeholder="搜索菜单" />
+      </div>
 
-            <NTree
-              v-model:selected-keys="selectedKeys"
-              :data="menuTree"
-              :pattern
-              block-line
-              label-field="name"
-              key-field="id"
-              :render-suffix="renderSuffix"
-              :show-irrelevant-nodes="true"
-              :node-props="nodeProps"
-            >
-            </NTree>
-          </NCard>
-        </NSpin>
-      </NGridItem>
+      <ElTree
+        :key="treeRenderKey"
+        :data="menuTree"
+        :props="treeProps"
+        :current-node-key="currentMenu?.id"
+        :default-expanded-keys="expandedNodeIds"
+        highlight-current
+        :expand-on-click-node="false"
+        node-key="id"
+        @node-click="handleNodeClick"
+      >
+        <template #default="{ data }">
+          <div class="w-full flex items-center justify-between gap-2">
+            <ElText :type="highlightedNodeIds.has(data.id) ? 'primary' : undefined">{{ data.name }}</ElText>
+            <ElSpace align="center">
+              <ElText class="text-sm" type="primary">{{ data.code }}</ElText>
+              <button
+                type="button"
+                class="i-tabler:copy cursor-pointer text-base text-primary"
+                aria-label="复制菜单编码"
+                @click.stop="handleCopy(data.code)"
+              ></button>
+            </ElSpace>
+          </div>
+        </template>
+      </ElTree>
+    </ElCard>
 
-      <NGridItem>
-        <NCard size="small" :title="currentMenu?.name">
-          <NAlert title="温馨提示" type="info">点击菜单开始</NAlert>
-          <template v-if="currentMenu" #header-extra>
-            <NSpace>
-              <NButton v-role="'btn0002'" type="primary" ghost size="small" @click="handleAddMenu(2)"
-                >添加子菜单</NButton
-              >
-              <NButton v-role="'btn0003'" type="error" ghost size="small" @click="handleRemoveMenu">删除</NButton>
-            </NSpace>
+    <ElCard>
+      <template #header>
+        <div class="flex items-center justify-between gap-2">
+          <span>{{ currentMenu?.name }}</span>
+          <ElSpace v-if="currentMenu">
+            <ElButton v-role="'btn0002'" type="primary" plain size="small" @click="handleAddMenu(2)">
+              添加子菜单
+            </ElButton>
+            <ElButton v-role="'btn0003'" type="danger" plain size="small" @click="handleRemoveMenu">删除</ElButton>
+          </ElSpace>
+        </div>
+      </template>
+
+      <ElAlert title="温馨提示" type="info">点击菜单开始</ElAlert>
+
+      <ElForm
+        v-if="currentMenu"
+        ref="formRef"
+        :model="formData"
+        :rules="rules"
+        class="my-4"
+        size="small"
+        label-position="left"
+        label-width="auto"
+      >
+        <ElFormItem label="菜单名称" prop="name">
+          <ElInput v-model="formData.name" placeholder="菜单名称" @input="validateFieldOnInput('name')" />
+        </ElFormItem>
+        <ElFormItem label="菜单code" prop="code">
+          <div class="w-full flex items-center gap-4">
+            <ElInput v-model="formData.code" class="flex-1" disabled placeholder="菜单code" />
+            <button
+              type="button"
+              class="i-tabler:copy cursor-pointer text-base text-primary"
+              aria-label="复制菜单编码"
+              @click="handleCopyCurrentMenuCode"
+            ></button>
+          </div>
+        </ElFormItem>
+        <ElFormItem label="排序" prop="sort">
+          <ElInputNumber
+            v-model="formData.sort"
+            class="w-full"
+            :min="1"
+            :precision="0"
+            placeholder="序号"
+            @change="validateFieldOnInput('sort')"
+          />
+        </ElFormItem>
+        <ElFormItem label="状态" prop="status">
+          <ElRadioGroup v-model="formData.status">
+            <ElRadio :value="1">启用</ElRadio>
+            <ElRadio :value="0">禁用</ElRadio>
+          </ElRadioGroup>
+        </ElFormItem>
+        <ElFormItem>
+          <div class="w-full flex-center">
+            <ElButton v-role="'btn0004'" :loading="menuEditLoading" type="primary" size="small" @click="handleSubmit">
+              保存
+            </ElButton>
+          </div>
+        </ElFormItem>
+      </ElForm>
+    </ElCard>
+
+    <ElCard>
+      <template #header>
+        <div class="flex items-center justify-between gap-2">
+          <span>按钮管理</span>
+          <ElSpace v-if="currentMenu">
+            <ElButton v-role="'btn0006'" type="primary" plain size="small" @click="handleButtonAdd">添加按钮</ElButton>
+          </ElSpace>
+        </div>
+      </template>
+
+      <ElAlert v-if="!currentMenu" title="温馨提示" type="info">点击菜单开始</ElAlert>
+      <ElTable v-if="currentMenu" v-loading="buttonLoading" class="mt-4" size="small" :data="buttonList">
+        <ElTableColumn prop="name" label="按钮名称" />
+        <ElTableColumn label="按钮code">
+          <template #default="{ row }">
+            <ElSpace align="center">
+              <ElText class="text-sm" type="info">{{ row.code }}</ElText>
+              <button
+                type="button"
+                class="i-tabler:copy cursor-pointer text-base text-primary"
+                aria-label="复制按钮编码"
+                @click.stop="handleCopy(row.code)"
+              ></button>
+            </ElSpace>
           </template>
-
-          <NForm
-            v-if="currentMenu"
-            ref="formRef"
-            :model="formData"
-            :rules
-            class="my-4"
-            size="small"
-            label-placement="left"
-            label-width="auto"
-          >
-            <NFormItem label="菜单名称" path="name">
-              <NInput v-model:value="formData.name" placeholder="菜单名称" />
-            </NFormItem>
-            <NFormItem label="菜单code" path="code">
-              <div class="w-full flex items-center gap-4">
-                <NInput v-model:value="formData.code" disabled placeholder="菜单code" class="flex-1" />
-                <div
-                  class="i-tabler:copy cursor-pointer text-base text-primary"
-                  @click="handleCopy(formData.code)"
-                ></div>
-              </div>
-            </NFormItem>
-
-            <NFormItem label="排序" path="sort">
-              <NInputNumber v-model:value="formData.sort" :min="1" :precision="0" placeholder="序号" />
-            </NFormItem>
-
-            <NFormItem label="状态" path="status">
-              <NRadioGroup v-model:value="formData.status">
-                <NRadio :value="1">启用</NRadio>
-                <NRadio :value="0">禁用</NRadio>
-              </NRadioGroup>
-            </NFormItem>
-
-            <NFormItem>
-              <div class="w-full flex-center">
-                <NButton
-                  v-role="'btn0004'"
-                  :loading="menuEditLoading"
-                  type="primary"
-                  attr-type="submit"
-                  size="small"
-                  @click="handleSubmit"
-                  >保存
-                </NButton>
-              </div>
-            </NFormItem>
-          </NForm>
-        </NCard>
-      </NGridItem>
-
-      <NGridItem>
-        <NCard size="small" title="按钮管理">
-          <NAlert v-if="!currentMenu" title="温馨提示" type="info">点击菜单开始</NAlert>
-          <template v-if="currentMenu" #header-extra>
-            <NSpace>
-              <NButton v-role="'btn0006'" type="primary" ghost size="small" @click="handleButtonAdd">添加按钮</NButton>
-            </NSpace>
+        </ElTableColumn>
+        <ElTableColumn prop="sort" label="排序" />
+        <ElTableColumn label="状态">
+          <template #default="{ row }">
+            <ElTag :type="row.status === 1 ? 'success' : 'danger'">{{ row.status === 1 ? '启用' : '禁用' }}</ElTag>
           </template>
-
-          <NDataTable v-if="currentMenu" size="small" class="mt-4" :columns :data="buttonList" :loading="buttonLoading">
-          </NDataTable>
-        </NCard>
-      </NGridItem>
-    </NGrid>
+        </ElTableColumn>
+        <ElTableColumn label="操作" width="120">
+          <template #default="{ row }">
+            <ElSpace>
+              <ElButton v-role="'btn0007'" text type="info" size="small" @click="handleButtonEdit(row)">编辑</ElButton>
+              <ElButton v-role="'btn0008'" text type="danger" size="small" @click="handleButtonDelete(row)">
+                删除
+              </ElButton>
+            </ElSpace>
+          </template>
+        </ElTableColumn>
+      </ElTable>
+    </ElCard>
 
     <MenuAddModal v-model:show="showMemuModal" :type="addType" :parent="currentMenu" @success="getMenuTree" />
     <ButtonAddModal
@@ -116,10 +160,9 @@
   </div>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { menuTreeApi, menuEditApi, menuDeleteApi, buttonListApi } from '@/api/setting/menu'
-import { type TreeOption, type FormRules, type FormInst, type DataTableColumns } from 'naive-ui'
-import { withModifiers } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
 import { useClipboard } from '@vueuse/core'
 import { to } from 'await-to-js'
 import { cloneDeep } from 'es-toolkit'
@@ -128,10 +171,17 @@ import ButtonAddModal from './components/ButtonAddModal.vue'
 
 const menuTree = ref<Api.Setting.MenuTree[]>([])
 const menuLoading = ref(false)
-const selectedKeys = ref<number[]>([])
+const treeProps = {
+  label: 'name',
+  children: 'children',
+}
+const treeRenderKey = ref(0)
+const expandedNodeIds = ref<number[]>([])
+const highlightedNodeIds = ref(new Set<number>())
 
 const formData = ref<Api.Setting.Menu | Recordable>({})
 const currentMenu = ref<Api.Setting.Menu>()
+const pattern = ref('')
 
 async function getMenuTree() {
   menuLoading.value = true
@@ -139,24 +189,9 @@ async function getMenuTree() {
   menuLoading.value = false
   if (err) return
   menuTree.value = data
+  updateTreeSearch(pattern.value)
 }
 getMenuTree()
-
-function renderSuffix(info: { option: TreeOption; checked: boolean; selected: boolean }) {
-  return (
-    <n-space align="center">
-      <n-text class="text-sm" type="primary">
-        {info.option.code}
-      </n-text>
-      <div
-        class="i-tabler:copy text-base text-primary"
-        onClick={withModifiers(() => {
-          handleCopy(info.option.code as string)
-        }, ['stop'])}
-      ></div>
-    </n-space>
-  )
-}
 
 const { copy } = useClipboard()
 async function handleCopy(text: string) {
@@ -168,24 +203,46 @@ async function handleCopy(text: string) {
   }
 }
 
-const pattern = ref('')
+function updateTreeSearch(value: string) {
+  const keyword = value.toLowerCase()
+  const expandedIds = new Set<number>()
+  const highlightedIds = new Set<number>()
 
-function nodeProps({ option }: { option: TreeOption }) {
-  return {
-    onClick() {
-      if (option.id === currentMenu.value?.id) {
-        currentMenu.value = undefined
-        return
+  function traverse(nodes: Api.Setting.MenuTree[], parentIds: number[]) {
+    for (const node of nodes) {
+      if (keyword && node.name.toLowerCase().includes(keyword)) {
+        highlightedIds.add(node.id)
+        parentIds.forEach((id) => expandedIds.add(id))
       }
-      currentMenu.value = option as unknown as Api.Setting.Menu
-      formData.value = cloneDeep(option)
-    },
+      if (node.children?.length) {
+        traverse(node.children, [...parentIds, node.id])
+      }
+    }
   }
+
+  traverse(menuTree.value, [])
+  expandedNodeIds.value = [...expandedIds]
+  highlightedNodeIds.value = highlightedIds
+  if (keyword) treeRenderKey.value++
+}
+
+watch(pattern, updateTreeSearch)
+
+function handleNodeClick(option: Api.Setting.MenuTree) {
+  if (option.id === currentMenu.value?.id) {
+    currentMenu.value = undefined
+    return
+  }
+  currentMenu.value = option as Api.Setting.Menu
+  formData.value = cloneDeep(option)
+}
+
+function handleCopyCurrentMenuCode() {
+  handleCopy(formData.value.code)
 }
 
 function resetTreeSelect() {
   currentMenu.value = undefined
-  selectedKeys.value = []
 }
 
 const showMemuModal = ref(false)
@@ -195,11 +252,16 @@ function handleAddMenu(type: 1 | 2) {
   showMemuModal.value = true
 }
 
-const formRef = useTemplateRef<FormInst>('formRef')
+const formRef = useTemplateRef<FormInstance>('formRef')
 const rules: FormRules = {
-  name: [{ required: true, message: '请输入菜单名称', trigger: ['blur', 'input'] }],
-  sort: [{ required: true, message: '请输入排序', type: 'number', trigger: ['blur', 'input'] }],
+  name: [{ required: true, message: '请输入菜单名称', trigger: ['blur', 'change'] }],
+  sort: [{ required: true, message: '请输入排序', type: 'number', trigger: ['blur', 'change'] }],
   status: [{ required: true, message: '请选择状态', type: 'number', trigger: ['blur', 'change'] }],
+}
+
+function validateFieldOnInput(field: string) {
+  const validation = formRef.value?.validateField(field)
+  void validation?.catch(() => {})
 }
 
 const menuEditLoading = ref(false)
@@ -236,62 +298,8 @@ function handleRemoveMenu() {
 const showButtonModal = ref(false)
 const currentButton = ref<Api.Setting.Menu>()
 const buttonList = ref<Api.Setting.Menu[]>([])
-
-const columns: DataTableColumns<Api.Setting.Menu> = [
-  {
-    title: '按钮名称',
-    key: 'name',
-  },
-  {
-    title: '按钮code',
-    key: 'code',
-    render(row) {
-      return (
-        <n-space align="center">
-          <n-text class="text-sm" type="info">
-            {row.code}
-          </n-text>
-          <div
-            class="i-tabler:copy cursor-pointer text-base text-primary"
-            onClick={withModifiers(() => {
-              handleCopy(row.code)
-            }, ['stop'])}
-          ></div>
-        </n-space>
-      )
-    },
-  },
-  {
-    title: '排序',
-    key: 'sort',
-  },
-  {
-    title: '状态',
-    key: 'status',
-    render(row) {
-      return <n-tag type={row.status === 1 ? 'success' : 'error'}>{row.status === 1 ? '启用' : '禁用'}</n-tag>
-    },
-  },
-  {
-    title: '操作',
-    key: 'action',
-    width: 120,
-    render(row) {
-      return (
-        <n-space>
-          <n-button v-role={'btn0007'} type="info" size="small" text onClick={() => handleButtonEdit(row)}>
-            编辑
-          </n-button>
-          <n-button v-role={'btn0008'} type="error" size="small" text onClick={() => handleButtonDelete(row)}>
-            删除
-          </n-button>
-        </n-space>
-      )
-    },
-  },
-]
-
 const buttonLoading = ref(false)
+
 async function getButtonList() {
   buttonLoading.value = true
   const [err, data] = await to(buttonListApi(currentMenu.value!.id))
@@ -302,13 +310,14 @@ async function getButtonList() {
   }
   buttonList.value = data
 }
+
 function handleButtonAdd() {
   currentButton.value = undefined
   showButtonModal.value = true
 }
 
-watch(currentMenu, (val) => {
-  if (!val) return
+watch(currentMenu, (value) => {
+  if (!value) return
   getButtonList()
 })
 
@@ -336,4 +345,22 @@ function handleButtonDelete(data: Api.Setting.Menu) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.menu-management-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .menu-management-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .menu-management-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+</style>

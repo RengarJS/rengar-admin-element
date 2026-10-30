@@ -1,14 +1,40 @@
 <template>
-  <NCard>
-    <NButton v-role="'btn0016'" type="primary" @click="handleAdd"> 新增用户</NButton>
-    <NDataTable class="mt-4" :columns :data="tableData" :loading remote :pagination :scroll-x="620"></NDataTable>
+  <ElCard>
+    <ElButton v-role="'btn0016'" type="primary" @click="handleAdd">新增用户</ElButton>
+    <ElTable class="mt-4" style="min-width: 620px" v-loading="loading" :data="tableData">
+      <ElTableColumn prop="id" label="id" width="120" />
+      <ElTableColumn prop="username" label="账户名" />
+      <ElTableColumn label="状态" width="120">
+        <template #default="{ row }">
+          <ElTag :type="row.status === 1 ? 'success' : 'danger'">
+            {{ row.status === 1 ? '启用' : '禁用' }}
+          </ElTag>
+        </template>
+      </ElTableColumn>
+      <ElTableColumn label="操作" width="260" fixed="right">
+        <template #default="{ row }">
+          <ElSpace>
+            <ElButton v-role="'btn0017'" type="primary" @click="handleEdit(row)">编辑</ElButton>
+            <ElButton v-role="'btn0019'" type="primary" @click="handlePassword(row)">修改密码</ElButton>
+            <ElButton v-role="'btn0018'" type="danger" @click="handleDelete(row)">删除</ElButton>
+          </ElSpace>
+        </template>
+      </ElTableColumn>
+    </ElTable>
+    <ElPagination
+      v-model:current-page="pagination.page"
+      class="mt-4 flex justify-end"
+      :page-size="pagination.pageSize"
+      :total="pagination.itemCount"
+      layout="total, prev, pager, next"
+      @current-change="handlePageChange"
+    />
     <AddOrEditModal v-model:show="showModal" :record @success="getPageList" />
     <PasswordModal v-model:show="showPasswordModal" :record />
-  </NCard>
+  </ElCard>
 </template>
 
-<script setup lang="tsx">
-import { NButton, NSpace, NTag, type DataTableColumns } from 'naive-ui'
+<script setup lang="ts">
 import { userPageListApi, userDeleteApi } from '@/api/setting/user'
 import { to } from 'await-to-js'
 import AddOrEditModal from './components/AddOrEditModal.vue'
@@ -16,55 +42,11 @@ import PasswordModal from './components/PasswordModal.vue'
 
 const loading = ref(false)
 const tableData = ref<Api.Setting.User[]>([])
-const columns: DataTableColumns<Api.Setting.User> = [
-  {
-    title: 'id',
-    key: 'id',
-    width: 120,
-  },
-  {
-    title: '账户名',
-    key: 'username',
-  },
-  {
-    title: '状态',
-    key: 'status',
-    width: 120,
-    render(row) {
-      return <NTag type={row.status === 1 ? 'success' : 'error'}>{row.status === 1 ? '启用' : '禁用'}</NTag>
-    },
-  },
-  {
-    title: '操作',
-    key: 'operation',
-    width: 260,
-    fixed: 'right',
-    render(row) {
-      return (
-        <NSpace>
-          <NButton v-role={'btn0017'} type="primary" onClick={() => handleEdit(row)}>
-            编辑
-          </NButton>
-          <NButton v-role={'btn0019'} type="primary" onClick={() => handlePassword(row)}>
-            修改密码
-          </NButton>
-          <NButton v-role={'btn0018'} type="error" onClick={() => handleDelete(row)}>
-            删除
-          </NButton>
-        </NSpace>
-      )
-    },
-  },
-]
 
 const pagination = reactive({
   page: 1,
   pageSize: 10,
   itemCount: 0,
-  onChange: (page: number) => {
-    pagination.page = page
-    getPageList()
-  },
 })
 
 async function getPageList() {
@@ -85,6 +67,11 @@ async function getPageList() {
 }
 
 getPageList()
+
+function handlePageChange(page: number) {
+  pagination.page = page
+  getPageList()
+}
 
 const showModal = ref(false)
 const record = ref<Api.Setting.User>()

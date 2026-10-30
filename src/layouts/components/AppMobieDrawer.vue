@@ -1,9 +1,7 @@
 <template>
-  <NDrawer v-model:show="show" :native-scrollbar="true" :auto-focus="false" placement="left" style="width: 80%">
-    <NDrawerContent title="系统菜单" :native-scrollbar="false" closable>
-      <SysMenu v-model:active="menuStore.activeMenu" :data="menuStore.menuRoutes" @change="handleMenuChange" />
-    </NDrawerContent>
-  </NDrawer>
+  <ElDrawer v-model="show" direction="ltr" size="80%" title="系统菜单">
+    <SysMenu v-model:active="menuStore.activeMenu" :data="menuStore.menuRoutes" @change="handleMenuChange" />
+  </ElDrawer>
 </template>
 
 <script setup lang="ts">

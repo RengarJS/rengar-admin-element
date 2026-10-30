@@ -1,40 +1,45 @@
 <template>
   <div class="max-w-[600px]">
-    <NSpin :show="menuLoading">
-      <NCard title="菜单管理" size="small">
-        <template #header-extra>
-          <NButton v-role="'btn0014'" type="primary" :loading="saveLoading" @click="handleSave"> 保存 </NButton>
-        </template>
-
-        <div class="my-4">
-          <NInput v-model:value="pattern" placeholder="搜索菜单" />
+    <ElCard v-loading="menuLoading">
+      <template #header>
+        <div class="flex items-center justify-between gap-2">
+          <span>菜单管理</span>
+          <ElButton v-role="'btn0014'" type="primary" :loading="saveLoading" @click="handleSave">保存</ElButton>
         </div>
+      </template>
 
-        <NTree
-          v-model:checked-keys="checkedKeys"
-          :data="menuTree"
-          ref="treeRef"
-          :pattern="pattern"
-          label-field="name"
-          key-field="id"
-          checkable
-          cascade
-          block-line
-          :show-irrelevant-nodes="true"
-        />
-      </NCard>
-    </NSpin>
+      <div class="my-4">
+        <ElInput v-model="pattern" placeholder="搜索菜单" />
+      </div>
+
+      <ElTree
+        v-if="menuTree.length"
+        :key="treeRenderKey"
+        ref="treeRef"
+        :data="menuTree"
+        :props="treeProps"
+        :default-expanded-keys="expandedNodeIds"
+        :default-checked-keys="checkedKeys"
+        node-key="id"
+        show-checkbox
+        :expand-on-click-node="false"
+        @check="handleCheck"
+      >
+        <template #default="{ data }">
+          <ElText :type="highlightedNodeIds.has(data.id) ? 'primary' : undefined">{{ data.name }}</ElText>
+        </template>
+      </ElTree>
+    </ElCard>
   </div>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { menuButtonEnabledTreeApi } from '@/api/setting/menu'
 import { roleConfigApi, roleConfigDetailApi } from '@/api/setting/role'
+import type { TreeInstance } from 'element-plus'
+import { nextTick, ref, watch } from 'vue'
 import { to } from 'await-to-js'
-import { ref } from 'vue'
-import type { TreeInst } from 'naive-ui'
 
-// ====== Props & Refs ======
 const route = useRoute<'setting-role-config'>()
 const id = Number(route.params.id)
 const checkedKeys = ref<number[]>([])
@@ -42,14 +47,19 @@ const menuTree = ref<Api.Setting.MenuTree[]>([])
 const menuLoading = ref(false)
 const saveLoading = ref(false)
 const pattern = ref('')
-const treeRef = ref<TreeInst | null>(null)
+const treeRef = useTemplateRef<TreeInstance>('treeRef')
+const treeProps = {
+  label: 'name',
+  children: 'children',
+}
+const treeRenderKey = ref(0)
+const expandedNodeIds = ref<number[]>([])
+const highlightedNodeIds = ref(new Set<number>())
 
-// ====== 工具函数：从原始 ID 列表中提取「叶子节点 ID」======
 function extractLeafIds(nodes: Api.Setting.MenuTree[], rawIdSet: Set<number>): number[] {
   const leafIds: number[] = []
 
   function traverse(node: Api.Setting.MenuTree) {
-    // 判断是否为叶子节点：没有 children 或 children 为空
     const isLeaf = !node.children || node.children.length === 0
 
     if (isLeaf) {
@@ -57,7 +67,6 @@ function extractLeafIds(nodes: Api.Setting.MenuTree[], rawIdSet: Set<number>): n
         leafIds.push(node.id)
       }
     } else {
-      // 非叶子节点：即使它在 rawIdSet 中，也不作为“权限节点”保留（仅用于 UI 分组）
       node.children!.forEach(traverse)
     }
   }
@@ -66,7 +75,6 @@ function extractLeafIds(nodes: Api.Setting.MenuTree[], rawIdSet: Set<number>): n
   return leafIds
 }
 
-// ====== 加载菜单树 + 角色已分配菜单 ======
 async function getMenuTree() {
   menuLoading.value = true
   const [err, tree] = await to(menuButtonEnabledTreeApi())
@@ -76,18 +84,46 @@ async function getMenuTree() {
   if (err || detailErr) return
 
   menuTree.value = tree
-
-  // ✅ 关键：只保留叶子节点用于初始化 checkedKeys
-  // 这样 NTree 才能正确计算父节点的半选/全选状态
   checkedKeys.value = extractLeafIds(tree, new Set(menuIds))
+  treeRenderKey.value++
+  await nextTick()
+  updateTreeSearch(pattern.value)
 }
 
 getMenuTree()
 
-// ====== 保存逻辑：直接提交当前 checkedKeys（含父子）======
+function updateTreeSearch(value: string) {
+  const keyword = value.toLowerCase()
+  const expandedIds = new Set<number>()
+  const highlightedIds = new Set<number>()
+
+  function traverse(nodes: Api.Setting.MenuTree[], parentIds: number[]) {
+    for (const node of nodes) {
+      if (keyword && node.name.toLowerCase().includes(keyword)) {
+        highlightedIds.add(node.id)
+        parentIds.forEach((parentId) => expandedIds.add(parentId))
+      }
+      if (node.children?.length) {
+        traverse(node.children, [...parentIds, node.id])
+      }
+    }
+  }
+
+  traverse(menuTree.value, [])
+  expandedNodeIds.value = [...expandedIds]
+  highlightedNodeIds.value = highlightedIds
+  if (keyword) treeRenderKey.value++
+}
+
+watch(pattern, updateTreeSearch)
+
+function handleCheck() {
+  checkedKeys.value = (treeRef.value?.getCheckedKeys(false) ?? []) as number[]
+}
+
 async function handleSave() {
   saveLoading.value = true
-  const halfIds = treeRef.value!.getIndeterminateData().keys as number[]
+  const halfIds = (treeRef.value?.getHalfCheckedKeys() ?? []) as number[]
   const [err] = await to(
     roleConfigApi({
       id,
