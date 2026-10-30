@@ -1,9 +1,11 @@
 <template>
-  <ElDialog v-model="show" :title="parent ? '添加按钮' : '编辑按钮'" width="500px" @closed="handleClose">
+  <ElDialog v-model="show" :title="currentButton ? '编辑按钮' : '添加按钮'" width="500px" @closed="handleClose">
     <ElForm
       ref="formRef"
+      v-loading="detailLoading"
       :model="formData"
       :rules="rules"
+      element-loading-text="正在加载按钮信息"
       class="my-8"
       size="small"
       label-position="left"
@@ -47,7 +49,7 @@
     </ElForm>
     <template #footer>
       <ElButton @click="show = false">取消</ElButton>
-      <ElButton type="primary" :loading="loading" @click="handleConfirm">确定</ElButton>
+      <ElButton type="primary" :disabled="detailLoading" :loading="loading" @click="handleConfirm">确定</ElButton>
     </template>
   </ElDialog>
 </template>
@@ -83,14 +85,21 @@ const formData = ref<Recordable>({
   type: 2,
 })
 
+const detailLoading = ref(false)
+let detailRequestId = 0
+
 watch(show, (val) => {
   if (val && currentButton) {
-    getDetail()
+    void getDetail(currentButton.id)
   }
 })
 
-async function getDetail() {
-  const [err, res] = await to(menuDetailApi(currentButton!.id))
+async function getDetail(buttonId: Api.Setting.Menu['id']) {
+  const requestId = ++detailRequestId
+  detailLoading.value = true
+  const [err, res] = await to(menuDetailApi(buttonId))
+  if (requestId !== detailRequestId) return
+  detailLoading.value = false
   if (err) return
   formData.value = res
 }
@@ -109,6 +118,7 @@ function validateFieldOnInput(field: string) {
 
 const loading = ref(false)
 async function handleSubmit() {
+  if (detailLoading.value) return false
   const [validErr] = await to(formRef.value!.validate())
   if (validErr) return false
   loading.value = true
@@ -122,7 +132,7 @@ async function handleSubmit() {
   )
   loading.value = false
   if (err) return false
-  window.$message?.success(`${parent ? '新增' : '编辑'}成功`)
+  window.$message?.success(`${currentButton ? '编辑' : '新增'}成功`)
   emit('success')
   return true
 }
@@ -134,6 +144,8 @@ async function handleConfirm() {
 }
 
 function handleClose() {
+  detailRequestId += 1
+  detailLoading.value = false
   for (const key in formData.value) {
     formData.value[key] = null
   }

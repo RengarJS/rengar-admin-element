@@ -1,7 +1,6 @@
 // 初始版本设为空，将在 mounted 时从 version.json 获取
-import { NButton, useNotification } from 'naive-ui'
+import { ElButton, ElNotification } from 'element-plus'
 export function useUpdateChecker(time = 1000 * 60 * 5) {
-  const notification = useNotification()
   let currentVersion = ''
   let timer: any = null
 
@@ -28,16 +27,17 @@ export function useUpdateChecker(time = 1000 * 60 * 5) {
   }
 
   function openDiaLog() {
-    notification.info({
+    ElNotification.info({
       title: '温馨提示',
-      content: '检测到新版本，是否刷新页面？',
-      action: () => {
-        return (
-          <NButton block type="info" onClick={() => refreshPage()}>
+      message: (
+        <div>
+          <div>检测到新版本，是否刷新页面？</div>
+          <ElButton block type="info" class="mt-2" onClick={refreshPage}>
             刷新
-          </NButton>
-        )
-      },
+          </ElButton>
+        </div>
+      ),
+      duration: 0,
     })
   }
   onMounted(() => {

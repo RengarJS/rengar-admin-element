@@ -1,7 +1,7 @@
 <template>
-  <NEl :is="component" class="theme">
-    <slot></slot>
-  </NEl>
+  <component :is="component" class="theme">
+    <slot />
+  </component>
 </template>
 
 <script setup lang="ts">

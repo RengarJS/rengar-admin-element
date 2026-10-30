@@ -6,7 +6,17 @@
     @opened="handleOpen"
     @closed="handleClose"
   >
-    <ElForm ref="formRef" :model="formData" :rules class="my-4" size="small" label-position="left" label-width="auto">
+    <ElForm
+      ref="formRef"
+      v-loading="detailLoading"
+      :model="formData"
+      :rules
+      element-loading-text="正在加载用户信息"
+      class="my-4"
+      size="small"
+      label-position="left"
+      label-width="auto"
+    >
       <ElFormItem label="账户名" prop="username">
         <ElInput v-model="formData.username" placeholder="账户名" @input="validateFieldOnInput('username')" />
       </ElFormItem>
@@ -34,7 +44,7 @@
     </ElForm>
     <template #footer>
       <ElButton @click="show = false">取消</ElButton>
-      <ElButton type="primary" :loading="loading" @click="handleConfirm">确定</ElButton>
+      <ElButton type="primary" :disabled="detailLoading" :loading="loading" @click="handleConfirm">确定</ElButton>
     </template>
   </ElDialog>
 </template>
@@ -65,6 +75,7 @@ const formData = ref<Recordable>({
 })
 
 const formRef = useTemplateRef<FormInstance>('formRef')
+const detailLoading = ref(false)
 const rules: FormRules = {
   username: [{ required: true, message: '请输入账户名', trigger: ['blur', 'change'] }],
   password: [{ required: true, message: '请输入密码', trigger: ['blur', 'change'] }],
@@ -93,17 +104,25 @@ getRoleList()
 
 function handleOpen() {
   if (record) {
-    getDetail()
+    void getDetail(record.id)
   }
 }
 
-async function getDetail() {
-  const [err, res] = await to(userDetailApi(record!.id))
+let detailRequestId = 0
+
+async function getDetail(userId: Api.Setting.User['id']) {
+  const requestId = ++detailRequestId
+  detailLoading.value = true
+  const [err, res] = await to(userDetailApi(userId))
+  if (requestId !== detailRequestId) return
+  detailLoading.value = false
   if (err) return
   formData.value = res
 }
 
 function handleClose() {
+  detailRequestId += 1
+  detailLoading.value = false
   for (const key in formData.value) {
     formData.value[key] = null
   }
@@ -111,6 +130,7 @@ function handleClose() {
 
 const loading = ref(false)
 async function handleSubmit() {
+  if (detailLoading.value) return false
   const [validErr] = await to(formRef.value!.validate())
   if (validErr) return false
   loading.value = true
