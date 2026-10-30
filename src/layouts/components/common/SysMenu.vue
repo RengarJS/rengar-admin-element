@@ -5,10 +5,11 @@
     :mode
     :collapse="mode === 'vertical' && Boolean(collapsed)"
     :collapse-transition="true"
+    :ellipsis="mode === 'horizontal'"
     :background-color="inverted ? '#0f172a' : undefined"
     :text-color="inverted ? '#f8fafc' : undefined"
     active-text-color="var(--el-color-primary)"
-    class="border-0"
+    class="sys-menu border-0"
     @select="handleValueChange"
   >
     <SysMenuItem v-for="route in data" :key="String(route.name ?? route.path)" :route :children-field />
@@ -50,4 +51,21 @@ function handleValueChange(val: string) {
 watch(activeIndex, (index) => menuRef.value?.updateActiveIndex(index), { flush: 'post' })
 </script>
 
-<style scoped></style>
+<style scoped>
+.sys-menu {
+  border-right: none;
+}
+
+.sys-menu.el-menu--horizontal {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border-bottom: none;
+}
+
+.sys-menu.el-menu--horizontal :deep(.el-menu-item.is-active),
+.sys-menu.el-menu--horizontal :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
+  border-bottom: none;
+}
+</style>

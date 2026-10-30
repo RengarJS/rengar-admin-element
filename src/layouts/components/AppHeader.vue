@@ -3,7 +3,7 @@
     <SysLogo v-if="showLogo" :show-title="!isMobile" />
     <MobieMenuControl v-if="!isPc" />
     <AsideControl v-if="showAsideControl" />
-    <div class="min-w-0 flex-1">
+    <div class="h-full min-w-0 flex flex-1 items-center">
       <slot></slot>
     </div>
     <div class="flex items-center gap-3 text-xl">

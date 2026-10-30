@@ -1,21 +1,21 @@
 <template>
   <ElSubMenu v-if="children.length" :index="menuIndex">
     <template #title>
-      <MenuIcon :options="route.meta" />
+      <ElIcon><MenuIcon :options="route.meta" /></ElIcon>
       <span>{{ route.meta?.title }}</span>
     </template>
     <SysMenuItem v-for="child in children" :key="String(child.name ?? child.path)" :route="child" :children-field />
   </ElSubMenu>
 
   <ElMenuItem v-else-if="route.meta?.href" :index="menuIndex" @click="handleOpenExternal">
-    <MenuIcon :options="route.meta" />
-    <span>{{ route.meta?.title }}</span>
+    <ElIcon><MenuIcon :options="route.meta" /></ElIcon>
+    <template #title>{{ route.meta?.title }}</template>
   </ElMenuItem>
 
   <RouterLink v-else :to="routeLocation" custom v-slot="{ navigate }">
     <ElMenuItem :index="menuIndex" @click="navigate()">
-      <MenuIcon :options="route.meta" />
-      <span>{{ route.meta?.title }}</span>
+      <ElIcon><MenuIcon :options="route.meta" /></ElIcon>
+      <template #title>{{ route.meta?.title }}</template>
     </ElMenuItem>
   </RouterLink>
 </template>

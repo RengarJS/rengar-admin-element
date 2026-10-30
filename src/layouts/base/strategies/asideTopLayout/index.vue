@@ -12,7 +12,7 @@
           mode="horizontal"
           :data="menuStore.menuRoutes"
           children-field="list"
-          v-model:active="menuStore.topActiveName"
+          v-model:active="menuStore.activeMenu"
         />
       </AppHeader>
     </ElHeader>
