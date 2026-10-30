@@ -14,7 +14,7 @@ import { useAppStore } from '@/stores'
 const appStore = useAppStore()
 
 function jumpToGithub() {
-  window.open('https://github.com/RengarJS/rengar-admin')
+  window.open('https://github.com/RengarJS/rengar-admin-element')
 }
 </script>
 

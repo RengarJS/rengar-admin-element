@@ -1,10 +1,10 @@
-[![Stars](https://img.shields.io/github/stars/RengarJS/rengar-admin.svg?style=social&label=Star)](https://github.com/RengarJS/rengar-admin/stargazers)
-[![Forks](https://img.shields.io/github/forks/RengarJS/rengar-admin.svg?style=social&label=Fork)](https://github.com/RengarJS/rengar-admin/network/members)
-[![License](https://img.shields.io/github/license/RengarJS/rengar-admin.svg?color=green)](https://github.com/RengarJS/rengar-admin/blob/main/LICENSE.txt)
+[![Stars](https://img.shields.io/github/stars/RengarJS/rengar-admin.svg?style=social&label=Star)](https://github.com/RengarJS/rengar-admin-element/stargazers)
+[![Forks](https://img.shields.io/github/forks/RengarJS/rengar-admin.svg?style=social&label=Fork)](https://github.com/RengarJS/rengar-admin-element/network/members)
+[![License](https://img.shields.io/github/license/RengarJS/rengar-admin.svg?color=green)](https://github.com/RengarJS/rengar-admin-element/blob/main/LICENSE.txt)
 
 [项目文档](https://www.rengar.site/doc)
 
-[在线预览](https://www.rengar.site)
+[在线预览](https://www.rengar.site/element-plus)
 
 > [!NOTE]
 > 如果您觉得 `Rengar-admin` 对您有所帮助，或者您喜欢我们的项目，请在 GitHub 上给我们一个 ⭐️。您的支持是我们持续改进和增加新功能的动力！感谢您的支持！
