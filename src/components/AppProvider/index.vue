@@ -8,12 +8,10 @@
 
 <script setup lang="ts">
 import elementPlusLocale from 'element-plus/es/locale/lang/zh-cn'
-import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
-import { getCurrentInstance, h, reactive } from 'vue'
+import { h, reactive } from 'vue'
 import App from '@/App.vue'
 import AppWaterMark from '@/layouts/components/AppWaterMark.vue'
 import AppRouteLoadingBar from '@/components/AppRouteLoadingBar/index.vue'
-import { createElementDialogService } from '@/utils/elementDialog'
 
 defineOptions({
   name: 'AppProvider',
@@ -22,7 +20,6 @@ defineOptions({
 const GlobalUiServices = defineComponent({
   name: 'GlobalUiServices',
   setup() {
-    const appContext = getCurrentInstance()?.appContext ?? null
     const loadingBarState = reactive<{
       visible: boolean
       percentage: number
@@ -80,12 +77,6 @@ const GlobalUiServices = defineComponent({
       finish: () => completeLoadingBar(),
       error: () => completeLoadingBar('exception'),
     }
-    ElMessage._context = appContext
-    ElMessageBox._context = appContext
-    ElNotification._context = appContext
-    window.$dialog = createElementDialogService(appContext)
-    window.$message = ElMessage
-    window.$notification = ElNotification
     return () =>
       h(AppRouteLoadingBar, {
         visible: loadingBarState.visible,
