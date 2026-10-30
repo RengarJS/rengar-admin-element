@@ -69,6 +69,7 @@ const showAsideControl = computed(() => {
   flex-shrink: 0;
   padding: 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
+  background-color: var(--el-menu-bg-color);
 }
 
 .layout-header.is-inverted {

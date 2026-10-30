@@ -12,7 +12,13 @@
     class="sys-menu border-0"
     @select="handleValueChange"
   >
-    <SysMenuItem v-for="route in data" :key="String(route.name ?? route.path)" :route :children-field />
+    <SysMenuItem
+      v-for="route in data"
+      :key="String(route.name ?? route.path)"
+      :route
+      :children-field
+      :selectable-parent
+    />
   </ElMenu>
 </template>
 
@@ -30,12 +36,14 @@ const {
   data,
   collapsed,
   inverted = false,
+  selectableParent = false,
 } = defineProps<{
   mode?: 'horizontal' | 'vertical'
   data: RouteRecordRaw[]
   collapsed?: boolean
   childrenField?: string
   inverted?: boolean
+  selectableParent?: boolean
 }>()
 
 const value = defineModel<RouteRecordName>('active')
@@ -64,8 +72,8 @@ watch(activeIndex, (index) => menuRef.value?.updateActiveIndex(index), { flush: 
   border-bottom: none;
 }
 
-.sys-menu.el-menu--horizontal :deep(.el-menu-item.is-active),
-.sys-menu.el-menu--horizontal :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
-  border-bottom: none;
+.sys-menu.el-menu--horizontal :deep(.el-menu-item),
+.sys-menu.el-menu--horizontal :deep(.el-sub-menu__title) {
+  border-bottom: 2px solid transparent;
 }
 </style>

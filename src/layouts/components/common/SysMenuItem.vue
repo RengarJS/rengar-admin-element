@@ -1,5 +1,10 @@
 <template>
-  <ElSubMenu v-if="children.length" :index="menuIndex">
+  <ElMenuItem v-if="selectableParent && children.length" :index="menuIndex">
+    <ElIcon><MenuIcon :options="route.meta" /></ElIcon>
+    <template #title>{{ route.meta?.title }}</template>
+  </ElMenuItem>
+
+  <ElSubMenu v-else-if="children.length" :index="menuIndex">
     <template #title>
       <ElIcon><MenuIcon :options="route.meta" /></ElIcon>
       <span>{{ route.meta?.title }}</span>
@@ -31,9 +36,11 @@ const props = withDefaults(
   defineProps<{
     route: RouteRecordRaw
     childrenField?: string
+    selectableParent?: boolean
   }>(),
   {
     childrenField: 'children',
+    selectableParent: false,
   },
 )
 

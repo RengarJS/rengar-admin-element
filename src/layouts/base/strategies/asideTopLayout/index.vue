@@ -12,7 +12,8 @@
           mode="horizontal"
           :data="menuStore.menuRoutes"
           children-field="list"
-          v-model:active="menuStore.activeMenu"
+          :selectable-parent="true"
+          v-model:active="menuStore.topActiveName"
         />
       </AppHeader>
     </ElHeader>
@@ -102,6 +103,7 @@ const showAsideControl = computed(() => {
   flex-shrink: 0;
   overflow: hidden;
   border-right: 1px solid var(--el-border-color-lighter);
+  background-color: var(--el-menu-bg-color);
   transition: width 0.28s cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -113,6 +115,7 @@ const showAsideControl = computed(() => {
   flex-shrink: 0;
   padding: 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
+  background-color: var(--el-menu-bg-color);
 }
 
 .layout-header.is-inverted {

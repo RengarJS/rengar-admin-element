@@ -1,195 +1,197 @@
 <template>
-  <ElDrawer v-model="show" title="系统配置" size="min(400px, 100vw)">
-    <div>
-      <ElDivider>布局模式</ElDivider>
+  <ElDrawer v-model="show" title="系统配置" size="min(400px, 100vw)" body-class="settings-drawer-body">
+    <ElScrollbar height="100%" always class="settings-scrollbar" view-class="settings-scrollbar-view">
+      <div>
+        <ElDivider>布局模式</ElDivider>
 
-      <ElRow :gutter="16">
-        <ElCol :span="8">
-          <div
-            class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
-            :class="[userConfig.layoutMode === 'aside' ? ' border border-primary' : '']"
-            @click="handleChangeLayout('aside')"
-          >
-            <div class="h-[80px] w-full flex gap-2">
-              <div class="w-5 rounded bg-primary"></div>
-              <div class="flex flex-1 flex-col gap-2">
-                <div class="h-5 rounded bg-primary-300"></div>
-                <div class="flex-1 rounded bg-primary-300"></div>
+        <ElRow :gutter="16">
+          <ElCol :span="8">
+            <div
+              class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
+              :class="[userConfig.layoutMode === 'aside' ? ' border border-primary' : '']"
+              @click="handleChangeLayout('aside')"
+            >
+              <div class="h-[80px] w-full flex gap-2">
+                <div class="w-5 rounded bg-primary"></div>
+                <div class="flex flex-1 flex-col gap-2">
+                  <div class="h-5 rounded bg-primary-300"></div>
+                  <div class="flex-1 rounded bg-primary-300"></div>
+                </div>
               </div>
+              <div>经典布局</div>
             </div>
-            <div>经典布局</div>
-          </div>
-        </ElCol>
-        <ElCol :span="8">
-          <div
-            class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
-            :class="[userConfig.layoutMode === 'top' ? ' border border-primary' : '']"
-            @click="handleChangeLayout('top')"
-          >
-            <div class="h-[80px] w-full flex flex-col gap-2">
-              <div class="h-5 rounded bg-primary"></div>
-              <div class="flex-1 rounded bg-primary-300"></div>
-            </div>
-            <div>顶部菜单布局</div>
-          </div>
-        </ElCol>
-
-        <ElCol :span="8">
-          <div
-            class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
-            :class="[userConfig.layoutMode === 'top-aside' ? ' border border-primary' : '']"
-            @click="handleChangeLayout('top-aside')"
-          >
-            <div class="h-[80px] w-full flex gap-2">
-              <div class="w-5 rounded bg-primary"></div>
-              <div class="flex flex-1 flex-col gap-2">
+          </ElCol>
+          <ElCol :span="8">
+            <div
+              class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
+              :class="[userConfig.layoutMode === 'top' ? ' border border-primary' : '']"
+              @click="handleChangeLayout('top')"
+            >
+              <div class="h-[80px] w-full flex flex-col gap-2">
                 <div class="h-5 rounded bg-primary"></div>
                 <div class="flex-1 rounded bg-primary-300"></div>
               </div>
+              <div>顶部菜单布局</div>
             </div>
-            <div>一级菜单顶部</div>
-          </div>
-        </ElCol>
+          </ElCol>
 
-        <ElCol :span="8">
-          <div
-            class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
-            :class="[userConfig.layoutMode === 'aside-double' ? ' border border-primary' : '']"
-            @click="handleChangeLayout('aside-double')"
-          >
-            <div class="h-[80px] w-full flex gap-1">
-              <div class="w-5 rounded bg-primary"></div>
-              <div class="w-4 rounded bg-primary"></div>
-              <div class="flex flex-1 flex-col gap-2">
-                <div class="h-5 rounded bg-primary-300"></div>
-                <div class="flex-1 rounded bg-primary-300"></div>
+          <ElCol :span="8">
+            <div
+              class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
+              :class="[userConfig.layoutMode === 'top-aside' ? ' border border-primary' : '']"
+              @click="handleChangeLayout('top-aside')"
+            >
+              <div class="h-[80px] w-full flex gap-2">
+                <div class="w-5 rounded bg-primary"></div>
+                <div class="flex flex-1 flex-col gap-2">
+                  <div class="h-5 rounded bg-primary"></div>
+                  <div class="flex-1 rounded bg-primary-300"></div>
+                </div>
               </div>
+              <div>一级菜单顶部</div>
             </div>
-            <div>左侧双布局</div>
-          </div>
-        </ElCol>
-      </ElRow>
-    </div>
+          </ElCol>
 
-    <div>
-      <ElDivider>路由动画</ElDivider>
-      <ElRadioGroup v-model="userConfig.transitionName">
-        <ElRow :gutter="16" class="settings-transition-grid">
-          <ElCol v-for="item in transitionOptions" :key="item.value" :span="6">
-            <ElRadioButton :value="item.value">{{ item.label }}</ElRadioButton>
+          <ElCol :span="8">
+            <div
+              class="flex flex-col cursor-pointer items-center gap-4 rounded p-2"
+              :class="[userConfig.layoutMode === 'aside-double' ? ' border border-primary' : '']"
+              @click="handleChangeLayout('aside-double')"
+            >
+              <div class="h-[80px] w-full flex gap-1">
+                <div class="w-5 rounded bg-primary"></div>
+                <div class="w-4 rounded bg-primary"></div>
+                <div class="flex flex-1 flex-col gap-2">
+                  <div class="h-5 rounded bg-primary-300"></div>
+                  <div class="flex-1 rounded bg-primary-300"></div>
+                </div>
+              </div>
+              <div>左侧双布局</div>
+            </div>
           </ElCol>
         </ElRow>
-      </ElRadioGroup>
-    </div>
+      </div>
 
-    <div>
-      <ElDivider>主题色</ElDivider>
-      <div class="settings-theme-color">
-        <ElColorPicker
-          v-model="appStore.themeOverrides.common.primaryColor"
-          class="settings-theme-color__picker"
-          :show-alpha="false"
-          aria-label="主题色"
-          @change="handleChangePrimaryColor"
-        />
-        <div
-          class="settings-theme-color__preview"
-          :style="{ backgroundColor: appStore.themeOverrides.common.primaryColor }"
-        >
-          {{ appStore.themeOverrides.common.primaryColor.toUpperCase() }}
+      <div>
+        <ElDivider>路由动画</ElDivider>
+        <ElRadioGroup v-model="userConfig.transitionName">
+          <ElRow :gutter="16" class="settings-transition-grid">
+            <ElCol v-for="item in transitionOptions" :key="item.value" :span="6">
+              <ElRadioButton :value="item.value">{{ item.label }}</ElRadioButton>
+            </ElCol>
+          </ElRow>
+        </ElRadioGroup>
+      </div>
+
+      <div>
+        <ElDivider>主题色</ElDivider>
+        <div class="settings-theme-color">
+          <ElColorPicker
+            v-model="appStore.themeOverrides.common.primaryColor"
+            class="settings-theme-color__picker"
+            :show-alpha="false"
+            aria-label="主题色"
+            @change="handleChangePrimaryColor"
+          />
+          <div
+            class="settings-theme-color__preview"
+            :style="{ backgroundColor: appStore.themeOverrides.common.primaryColor }"
+          >
+            {{ appStore.themeOverrides.common.primaryColor.toUpperCase() }}
+          </div>
         </div>
       </div>
-    </div>
 
-    <div>
-      <ElDivider>网站配置</ElDivider>
-      <div class="settings-config-list">
-        <div class="settings-config-row">
-          <div class="settings-config-label">头部高度</div>
-          <ElInputNumber
-            v-model="userConfig.headerHeight"
-            :precision="0"
-            controls-position="right"
-            class="settings-config-input"
-          />
-        </div>
-        <div class="settings-config-row">
-          <div class="settings-config-label">标签栏高度</div>
-          <ElInputNumber
-            v-model="userConfig.tabHeight"
-            :precision="0"
-            controls-position="right"
-            class="settings-config-input"
-          />
-        </div>
-        <div class="settings-config-row">
-          <div class="settings-config-label">侧边栏宽度</div>
-          <ElInputNumber
-            v-model="userConfig.asideWidth"
-            :precision="0"
-            controls-position="right"
-            class="settings-config-input"
-          />
-        </div>
+      <div>
+        <ElDivider>网站配置</ElDivider>
+        <div class="settings-config-list">
+          <div class="settings-config-row">
+            <div class="settings-config-label">头部高度</div>
+            <ElInputNumber
+              v-model="userConfig.headerHeight"
+              :precision="0"
+              controls-position="right"
+              class="settings-config-input"
+            />
+          </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">标签栏高度</div>
+            <ElInputNumber
+              v-model="userConfig.tabHeight"
+              :precision="0"
+              controls-position="right"
+              class="settings-config-input"
+            />
+          </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">侧边栏宽度</div>
+            <ElInputNumber
+              v-model="userConfig.asideWidth"
+              :precision="0"
+              controls-position="right"
+              class="settings-config-input"
+            />
+          </div>
 
-        <div class="settings-config-row">
-          <div class="settings-config-label">底部高度</div>
-          <ElInputNumber
-            v-model="userConfig.footerHeight"
-            :precision="0"
-            controls-position="right"
-            class="settings-config-input"
-          />
-        </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">底部高度</div>
+            <ElInputNumber
+              v-model="userConfig.footerHeight"
+              :precision="0"
+              controls-position="right"
+              class="settings-config-input"
+            />
+          </div>
 
-        <div class="settings-config-row">
-          <div class="settings-config-label">间隙</div>
-          <ElInputNumber
-            v-model="userConfig.gap"
-            :precision="0"
-            controls-position="right"
-            class="settings-config-input"
-          />
-        </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">间隙</div>
+            <ElInputNumber
+              v-model="userConfig.gap"
+              :precision="0"
+              controls-position="right"
+              class="settings-config-input"
+            />
+          </div>
 
-        <div class="settings-config-row">
-          <div class="settings-config-label">显示面包屑</div>
-          <ElSwitch v-model="userConfig.showBreadcrumb" class="settings-config-switch" />
-        </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">显示面包屑</div>
+            <ElSwitch v-model="userConfig.showBreadcrumb" class="settings-config-switch" />
+          </div>
 
-        <div class="settings-config-row">
-          <div class="settings-config-label">显示标签栏</div>
-          <ElSwitch v-model="userConfig.showTabs" class="settings-config-switch" />
-        </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">显示标签栏</div>
+            <ElSwitch v-model="userConfig.showTabs" class="settings-config-switch" />
+          </div>
 
-        <div class="settings-config-row">
-          <div class="settings-config-label">显示底部</div>
-          <ElSwitch v-model="userConfig.showFooter" class="settings-config-switch" />
-        </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">显示底部</div>
+            <ElSwitch v-model="userConfig.showFooter" class="settings-config-switch" />
+          </div>
 
-        <div class="settings-config-row">
-          <div class="settings-config-label">头部颜色反转</div>
-          <ElSwitch v-model="userConfig.invertedHeader" class="settings-config-switch" />
-        </div>
-        <div class="settings-config-row">
-          <div class="settings-config-label">侧边栏颜色反转</div>
-          <ElSwitch v-model="userConfig.invertedAside" class="settings-config-switch" />
-        </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">头部颜色反转</div>
+            <ElSwitch v-model="userConfig.invertedHeader" class="settings-config-switch" />
+          </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">侧边栏颜色反转</div>
+            <ElSwitch v-model="userConfig.invertedAside" class="settings-config-switch" />
+          </div>
 
-        <div class="settings-config-row">
-          <div class="settings-config-label">全局水印</div>
-          <ElSwitch v-model="userConfig.showWaterMark" class="settings-config-switch" />
-        </div>
-        <div class="settings-config-row">
-          <div class="settings-config-label">色弱模式</div>
-          <ElSwitch v-model="userConfig.colorWeakMode" class="settings-config-switch" />
-        </div>
-        <div class="settings-config-row">
-          <div class="settings-config-label">灰色模式</div>
-          <ElSwitch v-model="userConfig.grayMode" class="settings-config-switch" />
+          <div class="settings-config-row">
+            <div class="settings-config-label">全局水印</div>
+            <ElSwitch v-model="userConfig.showWaterMark" class="settings-config-switch" />
+          </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">色弱模式</div>
+            <ElSwitch v-model="userConfig.colorWeakMode" class="settings-config-switch" />
+          </div>
+          <div class="settings-config-row">
+            <div class="settings-config-label">灰色模式</div>
+            <ElSwitch v-model="userConfig.grayMode" class="settings-config-switch" />
+          </div>
         </div>
       </div>
-    </div>
+    </ElScrollbar>
 
     <template #footer>
       <div class="w-full flex justify-between">
@@ -266,6 +268,22 @@ function handleReset() {
 </script>
 
 <style scoped>
+:deep(.settings-drawer-body) {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+  padding-right: 0;
+}
+
+:deep(.settings-scrollbar) {
+  flex: 1;
+  min-height: 0;
+}
+
+:deep(.settings-scrollbar-view) {
+  padding-right: 20px;
+}
+
 .settings-theme-color {
   position: relative;
   width: 100%;

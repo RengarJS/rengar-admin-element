@@ -1,5 +1,5 @@
 <template>
-  <ElDialog v-model="show" title="修改密码" width="400px" @opened="handleOpen" @closed="handleClose">
+  <ElDialog v-model="show" title="修改密码" width="400px" align-center @opened="handleOpen" @closed="handleClose">
     <ElForm ref="formRef" :model="formValue" :rules class="my-4" size="small" label-position="left" label-width="auto">
       <ElFormItem prop="newPassword" label="新密码">
         <ElInput

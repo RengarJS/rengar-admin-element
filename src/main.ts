@@ -1,5 +1,6 @@
 import '@unocss/reset/tailwind-compat.css'
 import 'virtual:uno.css'
+import 'element-plus/theme-chalk/dark/css-vars.css'
 import 'element-plus/theme-chalk/el-message.css'
 
 import './assets/styles/main.css'

@@ -1,13 +1,15 @@
 <template>
   <div>
     <!-- 欢迎问候语 -->
-    <ElCard class="mb-4 from-primary-100 to-primary-50 bg-gradient-to-r dark:from-primary-500 dark:to-primary-200">
+    <ElCard class="mb-4 from-primary-100 to-primary-50 bg-gradient-to-r dark:from-primary-900 dark:to-primary-800">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-3">
           <SvgIcon icon="mdi:hand-wave" class="text-4xl text-yellow-500" />
           <div>
             <h2 class="text-xl font-bold">欢迎回来，{{ username || '管理员' }}！</h2>
-            <p class="mt-2 text-sm text-gray-600">今天是 {{ currentDate }} {{ getWeekDay() }}，祝您工作愉快！</p>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              今天是 {{ currentDate }} {{ getWeekDay() }}，祝您工作愉快！
+            </p>
           </div>
         </div>
         <ElButton type="primary" size="small" @click="refreshData">
@@ -20,7 +22,7 @@
     </ElCard>
 
     <!-- 待办事项 -->
-    <ElCard class="mb-4 from-blue-50 to-blue-100 bg-gradient-to-r dark:from-blue-800">
+    <ElCard class="mb-4 from-blue-50 to-blue-100 bg-gradient-to-r dark:from-blue-900 dark:to-blue-800">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <SvgIcon icon="mdi:clipboard-check" class="text-3xl text-blue-500" />
@@ -42,7 +44,7 @@
         </div>
       </div>
 
-      <div class="custom-scrollbar max-h-60 overflow-y-auto">
+      <div class="max-h-60 overflow-y-auto">
         <TransitionGroup name="todo-list" tag="ul" class="space-y-2">
           <li v-for="(todo, index) in todos" :key="todo.id" class="group">
             <div
@@ -90,62 +92,62 @@
     <div class="stats-grid">
       <!-- 统计卡片 -->
       <div>
-        <ElCard class="h-full from-blue-50 to-blue-100 bg-gradient-to-r">
+        <ElCard class="h-full from-blue-50 to-blue-100 bg-gradient-to-r dark:from-blue-900 dark:to-blue-800">
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-lg text-black font-bold">项目总数</div>
-              <div class="mt-2 text-3xl text-black font-bold">16</div>
+              <div class="text-lg text-gray-900 font-bold dark:text-gray-100">项目总数</div>
+              <div class="mt-2 text-3xl text-gray-900 font-bold dark:text-gray-100">16</div>
             </div>
             <div class="size-16 flex-center rounded-full bg-blue-500 text-white">
               <SvgIcon icon="mdi:folder" class="text-3xl" />
             </div>
           </div>
-          <div class="mt-4 text-sm text-gray-500">较昨日 +2 个项目</div>
+          <div class="mt-4 text-sm text-gray-500 dark:text-gray-300">较昨日 +2 个项目</div>
         </ElCard>
       </div>
 
       <div>
-        <ElCard class="h-full from-green-50 to-green-100 bg-gradient-to-r">
+        <ElCard class="h-full from-green-50 to-green-100 bg-gradient-to-r dark:from-green-900 dark:to-green-800">
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-lg text-black font-bold">活跃用户</div>
-              <div class="mt-2 text-3xl text-black font-bold">3,856</div>
+              <div class="text-lg text-gray-900 font-bold dark:text-gray-100">活跃用户</div>
+              <div class="mt-2 text-3xl text-gray-900 font-bold dark:text-gray-100">3,856</div>
             </div>
             <div class="size-16 flex-center rounded-full bg-green-500 text-white">
               <SvgIcon icon="mdi:account" class="text-3xl" />
             </div>
           </div>
-          <div class="mt-4 text-sm text-gray-500">较昨日 +12%</div>
+          <div class="mt-4 text-sm text-gray-500 dark:text-gray-300">较昨日 +12%</div>
         </ElCard>
       </div>
 
       <div>
-        <ElCard class="h-full from-yellow-50 to-yellow-100 bg-gradient-to-r">
+        <ElCard class="h-full from-yellow-50 to-yellow-100 bg-gradient-to-r dark:from-amber-900 dark:to-amber-800">
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-lg text-black font-bold">系统消息</div>
-              <div class="mt-2 text-3xl text-black font-bold">258</div>
+              <div class="text-lg text-gray-900 font-bold dark:text-gray-100">系统消息</div>
+              <div class="mt-2 text-3xl text-gray-900 font-bold dark:text-gray-100">258</div>
             </div>
             <div class="size-16 flex-center rounded-full bg-yellow-500 text-white">
               <SvgIcon icon="mdi:bell" class="text-3xl" />
             </div>
           </div>
-          <div class="mt-4 text-sm text-gray-500">较昨日 +48 条</div>
+          <div class="mt-4 text-sm text-gray-500 dark:text-gray-300">较昨日 +48 条</div>
         </ElCard>
       </div>
 
       <div>
-        <ElCard class="h-full from-red-50 to-red-100 bg-gradient-to-r">
+        <ElCard class="h-full from-red-50 to-red-100 bg-gradient-to-r dark:from-red-900 dark:to-red-800">
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-lg text-black font-bold">错误日志</div>
-              <div class="mt-2 text-3xl text-black font-bold">12</div>
+              <div class="text-lg text-gray-900 font-bold dark:text-gray-100">错误日志</div>
+              <div class="mt-2 text-3xl text-gray-900 font-bold dark:text-gray-100">12</div>
             </div>
             <div class="size-16 flex-center rounded-full bg-red-500 text-white">
               <SvgIcon icon="mdi:alert-circle" class="text-3xl" />
             </div>
           </div>
-          <div class="mt-4 text-sm text-gray-500">较昨日 -25%</div>
+          <div class="mt-4 text-sm text-gray-500 dark:text-gray-300">较昨日 -25%</div>
         </ElCard>
       </div>
     </div>
@@ -633,24 +635,6 @@ watch(
   .tech-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-}
-
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(155, 155, 155, 0.5);
-  border-radius: 20px;
 }
 
 .todo-list-enter-active,
