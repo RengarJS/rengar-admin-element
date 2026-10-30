@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "element-plus-skills": {
+      "source": "jiaiyan/element-plus-skills",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "3604c38953c20f99daef7200a0df2a552081e5c5d98f2878d95c41a24f66ed5a"
+    }
+  }
+}
